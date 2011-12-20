@@ -1,0 +1,119 @@
+#!/usr/bin/php
+<?php
+$_DIR = '/var/tmp/pkscript';
+$_FILE = 'pks'.@date('ymd-H-i-s');
+//////////////////////////////////
+
+$_HELP=false;
+$_DESC=false;
+$_atoms=$_SERVER['argv'];
+
+$_args=getopt('hd', array('help','desc'));
+foreach ($_args as $arg => $val)
+{
+	switch ($arg)
+	{
+		case 'h':
+			while (($i=array_search('-h', $_atoms) !== false)) unset($_atoms[$i]);
+		case 'help':
+			while (($i=array_search('--help', $_atoms) !== false)) unset($_atoms[$i]);
+			$_HELP=true; break;
+		case 'd':
+			while (($i=array_search('-d', $_atoms) !== false)) unset($_atoms[$i]);
+		case 'desc':
+			while (($i=array_search('--desc', $_atoms) !== false)) unset($_atoms[$i]);
+			$_DESC=true; break;
+		default: $_atoms.=' '.$arg;
+	}
+}
+unset($_atoms[0]);
+$_atoms=implode(' ', $_atoms);
+
+if ($_HELP || empty($_atoms))
+{
+$help=<<<HELP
+pkmerge: Custom installation of packages.
+Usage:
+    pkmerge [-h|--help] [-d|--desc] (emerge arguments)
+
+    -h --help    this help
+    -d --desc    get description for packages
+
+HELP;
+	die($help);
+}
+
+$emerge = array();
+exec('emerge -pe --color=n --tree --unordered-display '.$_atoms.' |& cat', $emerge);
+print implode("\n", $emerge);
+
+require_once(__DIR__.'/includes/portageq.class.php');
+require_once(__DIR__.'/includes/global.php');
+
+@mkdir($_DIR);
+
+$fscript = @fopen($_DIR.'/'.$_FILE, 'w+');
+if (!$fscript) die("$_DIR/$_FILE not created!\n");
+
+$args = implode(' ', $_SERVER['argv']);
+$hcode = <<<CODE
+#!/usr/bin/php
+<?php
+\$pkmerge='{$args}';
+\$pk=array();
+define('S','S',true);
+define('M','M',true);
+define('E',M,true);
+/////////////////////////////
+
+//// \$pk[][S-setup or E|M-exclude]
+//// Delete # where need.
+
+
+CODE;
+fwrite($fscript, $hcode);
+
+$_pkgs_all = array();
+foreach ($emerge as $line)
+{
+	if (preg_match_all("/^\[ebuild([^\]]+)\](\s+)([\w-]+)\/([\w-\.]+)(.*)?$/", $line, $match))
+	{
+		$line_info = array();
+		$line_info['status'] = str_replace(' ', '', $match[1][0]);
+		$line_info['tree'] = strlen($match[2][0]);
+		$line_info['category'] = $match[3][0];
+		$line_info['name'] = $match[4][0];
+		$line_info['info'] = $match[5][0];
+		
+		$_pkgs_all[] = array($line_info['tree'], $line_info['category'].'/'.$line_info['name']);
+		
+		//if (@strpbrk($line_info['status'], $_notebuild) !== false) continue;
+		
+		print $line_info['category'].'/'.$line_info['name'].":\n";
+		fwrite($fscript, "#\$pk[][M]=/*".str_repeat('|', $line_info['tree']-1)."*/\"{$line_info['category']}/{$line_info['name']}\";\n");
+		if ($_DESC)
+		{
+			if (atomInfo($line_info['category'].'/'.$line_info['name']) !== false)
+				fwrite($fscript, "           /*".implode('', $Portageq->metadata($line_info['category'].'/'.$line_info['name'], 'DESCRIPTION'))."*/\n");
+			else print "Warning: info for ".$line_info['category'].'/'.$line_info['name']." not found.\n";
+		}
+	}
+}
+
+$code = <<<CODE
+
+/////////////////////////////////////
+// Don't edit!!!
+
+CODE;
+
+foreach ($_pkgs_all as $k => $_pkg)
+	$code .= "\$_pkgs_all[$k]=array('".implode("','",$_pkg)."');\n";
+
+$code .= "\n\nrequire_once('".__DIR__."/includes/script.php');\n";
+
+fwrite($fscript, $code);
+fclose($fscript);
+chmod($_DIR.'/'.$_FILE, 0777);
+
+print "\nEdit $_DIR/$_FILE\n";
