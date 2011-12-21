@@ -90,7 +90,10 @@ foreach ($emerge as $line)
 		//if (@strpbrk($line_info['status'], $_notebuild) !== false) continue;
 		
 		print $line_info['category'].'/'.$line_info['name'].":\n";
-		fwrite($fscript, "#\$pk[][M]=/*".str_repeat('|', $line_info['tree']-1)."*/\"{$line_info['category']}/{$line_info['name']}\";\n");
+		$pk_text = '#$pk[][M]=/*';
+		if ($line_info['tree'] == 1) $pk_text = ' $pk[][S]=/*';
+		else if (strpos($line_info['status'], '#') !== false) $pk_text = ' $pk[][M]=/*';
+		fwrite($fscript, $pk_text.str_repeat('|', $line_info['tree']-1)."*/\"{$line_info['category']}/{$line_info['name']}\";\n");
 		if ($_DESC)
 		{
 			if (atomInfo($line_info['category'].'/'.$line_info['name']) !== false)
