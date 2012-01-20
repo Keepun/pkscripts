@@ -1,44 +1,63 @@
 #!/usr/bin/php
 <?php
-require_once(__DIR__.'/includes/portageq.class.php');
-require_once(__DIR__.'/includes/global.php');
+if (!defined('__DIR__')) define('__DIR__', dirname(__FILE__)); // for PHP<5.3
+require_once(__DIR__.'/includes/getopt.php');
 
 $_HELP=false;
-$_atoms=$_SERVER['argv'];
+$_KEYS=false;
+$_INFO='DESCRIPTION HOMEPAGE';
+$_atoms=array();
 
-$_args=getopt('h', array('help'));
+$_args=_getopt('h', array('help', 'info::', 'keys'));
+if ($_args === false) die("Error parse arguments!\n");
 foreach ($_args as $arg => $val)
 {
 	switch ($arg)
 	{
 		case 'h':
-			while (($i=array_search('-h', $_atoms) !== false)) unset($_atoms[$i]);
 		case 'help':
-			while (($i=array_search('--help', $_atoms) !== false)) unset($_atoms[$i]);
 			$_HELP=true; break;
-		default: $_atoms.=' '.$arg;
+		case 'keys':
+			$_KEYS=true; break;
+		case 'info':
+			if (is_array($val)) $_INFO=str_replace(',', ' ', implode(' ', $val));
+			else $_INFO=str_replace(',', ' ', $val);
+			break;
+		case '-':
+			if (is_array($val)) $_atoms=$val;
+			else $_atoms[]=$val;
+			break;
 	}
 }
-unset($_atoms[0]);
 
-for ($x=count($_atoms); $x>0; $x--) // because unset()
+if ($_KEYS)
 {
-    if (!preg_match("/^\S+\/\S+$/", $_atoms[$x]))
-    {
-	print "Error argument: {$_atoms[$x]}\n";
-	unset($_atoms[$x]);
-    }
+	$command='portageq --help | grep DESCRIPTION';
+	print $command."\n";
+	system($command);
+	die();
 }
 
-if ($_HELP || empty($_atoms))
+for ($x=count($_atoms)-1; $x>=0; $x--)
+{
+	if (!preg_match("/^\S+\/\S+$/", $_atoms[$x]))
+	{
+		print "Error argument: {$_atoms[$x]}\n";
+		unset($_atoms[$x]);
+	}
+}
+
+if ($_HELP || count($_atoms)==0)
 {
 $help=<<<HELP
 pkdesc: Get description for packages.
 Usage:
-    pkdesc [-h|--help]
-    pkdesc "category/package"
+    pkdesc [-h|--help] [--keys]
+    pkdesc [--info] "category/package"
 
     -h --help    this help
+       --info="{$_INFO}"
+       --keys    get keys for --info
 
 category/package: can use ? or *
     pkdesc "*/*"
@@ -50,18 +69,21 @@ HELP;
 	die($help);
 }
 
-print 'pkdesc "'.implode('" "', $_atoms)."\"\n";
+require_once(__DIR__.'/includes/portageq.class.php');
+require_once(__DIR__.'/includes/global.php');
+
+print 'pkdesc --info="'.$_INFO.'" "'.implode('" "', $_atoms)."\"\n";
 
 foreach ($_atoms as $atom)
 {
-    print "\n$atom\n";
-    $_result=array();
-    foreach (atomInfo($atom, false) as $a)
-	$_result[]=$a['category'].'/'.$a['name'].' '.$a['version'];
-    sort($_result);
-    foreach ($_result as $res)
-    {
-	print substr($res, 0, strrpos($res, ' ')).' - ';
-	print implode(' | ', $Portageq->metadata(str_replace(' ', '-', $res),'DESCRIPTION HOMEPAGE'))."\n";
-    }
+	print "\n$atom\n";
+	$_result=array();
+	foreach (atomInfo($atom, false) as $a)
+		$_result[]=$a['category'].'/'.$a['name'].' '.$a['version'];
+	sort($_result);
+	foreach ($_result as $res)
+	{
+		print substr($res, 0, strrpos($res, ' ')).' - ';
+		print implode(' | ', $Portageq->metadata(str_replace(' ', '-', $res),$_INFO))."\n";
+	}
 }
