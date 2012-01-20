@@ -15,21 +15,39 @@ function pmetadata($category_package, $keyS)
 /**
  * Search package and parse 'category', 'name', 'version'.
  * @param string $category_package
+ * @param bool $one get only first
  * @return bool|array if error === false
  */
-function atomInfo($category_package)
+function atomInfo($category_package, $one=true)
 {
 	global $Portageq;
 	$category_package='"*'.str_replace('/','/*/',$category_package).'.ebuild"';
-	$find=explode("\n", trim(`find {$Portageq->PORTDIR} -path $category_package`));
-	if (count($find) > 1 || empty($find[0])) return false; // invariable =1
-	$find=substr($find[0], strlen($Portageq->PORTDIR)+1);
-	$atom=explode('/',$find);
-	
+	$find=explode("\n", trim(`find {$Portageq->PORTDIR} -path "$category_package"`));
+	if (empty($find[0])) return false;
 	$info=array();
-	$info['category']=$atom[0];
-	$info['name']=$atom[1];
-	$info['version']=substr($atom[2], strlen($atom[1])+1, -7 /*strlen('.ebuild')*(-1)*/);
+
+	if ($one)
+	{
+	    $atom=explode('/',substr($find[0], strlen($Portageq->PORTDIR)+1));
+	    if (count($find) > 1 || count($atom) < 2) return false; // invariable =1
+	    $info['category']=$atom[0];
+	    $info['name']=$atom[1];
+	    $info['version']=substr($atom[2], strlen($atom[1])+1, -7 /*strlen('.ebuild')*(-1)*/);
+	    return $info;
+	}
+
+	$last='';
+	foreach ($find as $file)
+	{
+	    $atom=explode('/',substr($file, strlen($Portageq->PORTDIR)+1));
+	    if (count($atom) < 2 || $last == ($atom[0].'/'.$atom[1])) continue;
+	    $last=($atom[0].'/'.$atom[1]);
+	    $temp=array();
+	    $temp['category']=$atom[0];
+	    $temp['name']=$atom[1];
+	    $temp['version']=substr($atom[2], strlen($atom[1])+1, -7 /*strlen('.ebuild')*(-1)*/);
+	    $info[]=$temp;
+	}
 	return $info;
 }
 

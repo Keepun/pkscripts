@@ -1,0 +1,67 @@
+#!/usr/bin/php
+<?php
+require_once(__DIR__.'/includes/portageq.class.php');
+require_once(__DIR__.'/includes/global.php');
+
+$_HELP=false;
+$_atoms=$_SERVER['argv'];
+
+$_args=getopt('h', array('help'));
+foreach ($_args as $arg => $val)
+{
+	switch ($arg)
+	{
+		case 'h':
+			while (($i=array_search('-h', $_atoms) !== false)) unset($_atoms[$i]);
+		case 'help':
+			while (($i=array_search('--help', $_atoms) !== false)) unset($_atoms[$i]);
+			$_HELP=true; break;
+		default: $_atoms.=' '.$arg;
+	}
+}
+unset($_atoms[0]);
+
+for ($x=count($_atoms); $x>0; $x--) // because unset()
+{
+    if (!preg_match("/^\S+\/\S+$/", $_atoms[$x]))
+    {
+	print "Error argument: {$_atoms[$x]}\n";
+	unset($_atoms[$x]);
+    }
+}
+
+if ($_HELP || empty($_atoms))
+{
+$help=<<<HELP
+pkdesc: Get description for packages.
+Usage:
+    pkdesc [-h|--help]
+    pkdesc "category/package"
+
+    -h --help    this help
+
+category/package: can use ? or *
+    pkdesc "*/*"
+    pkdesc "media*/*font*" "app-misc/*"
+
+WARNING: category/package must be in quotes (" " or ' ')
+
+HELP;
+	die($help);
+}
+
+print 'pkdesc "'.implode('" "', $_atoms)."\"\n";
+
+foreach ($_atoms as $atom)
+{
+    print "\n$atom\n";
+    $_result=array();
+    foreach (atomInfo($atom, false) as $a)
+	$_result[]=$a['category'].'/'.$a['name'].' '.$a['version'];
+    sort($_result);
+    foreach ($_result as $res)
+    {
+	print substr($res, 0, strrpos($res, ' ')).' - ';
+	print implode(' | ', $Portageq->metadata(str_replace(' ', '-', $res),'DESCRIPTION HOMEPAGE'))."\n";
+    }
+}
