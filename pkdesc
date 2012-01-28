@@ -76,9 +76,11 @@ print 'pkdesc --info="'.$_INFO.'" "'.implode('" "', $_atoms)."\"\n";
 
 foreach ($_atoms as $atom)
 {
+	$atomInfo=atomInfo($atom, false);
+	if (!$atomInfo) {print "\n$atom - Not found!\n"; continue;}
 	print "\n$atom\n";
 	$_result=array();
-	foreach (atomInfo($atom, false) as $a)
+	foreach ($atomInfo as $a)
 		$_result[]=$a['category'].'/'.$a['name'].' '.$a['version'];
 	sort($_result);
 	foreach ($_result as $res)
