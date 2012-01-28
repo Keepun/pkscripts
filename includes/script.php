@@ -13,8 +13,11 @@ $_EXEC=false;
 $_NEWFILE=false;
 $_ONLYPK=false;
 $_MASK=false;
+$_EMERGE='';
+$_EMERGE_TEST='--unordered-display --color=y --autounmask=y';
+$_EMERGE_SETUP='--color=y --autounmask=y';
 
-$_args=getopt('hfd:cvnp', array('help','full','depth:','nocolor','verbose','desc','exec','new','pk','mask','test'));
+$_args=getopt('hfd::cvnp', array('help','full','depth::','nocolor','verbose','desc','exec','new','pk','mask','test','emerge::','emerge-test::','emerge-setup::'));
 foreach ($_args as $arg => $val)
 {
 	switch ($arg)
@@ -48,7 +51,18 @@ foreach ($_args as $arg => $val)
 			$_MASK=true; break;
 		case 'test':
 			$_ONLYPK=true; $_EXEC=true; break;
-		default: 0;
+		case 'emerge':
+			if (is_array($val)) $_EMERGE=implode(' ', $val);
+			else $_EMERGE=$val;
+			break;
+		case 'emerge-test':
+			if (is_array($val)) $_EMERGE_TEST=implode(' ', $val);
+			else $_EMERGE_TEST=$val;
+			break;
+		case 'emerge-setup':
+			if (is_array($val)) $_EMERGE_SETUP=implode(' ', $val);
+			else $_EMERGE_SETUP=$val;
+			break;
 	}
 }
 
@@ -57,7 +71,7 @@ if ($_HELP)
 $help=<<<HELP
     -h --help    this help
     -f --full    show all depends
-    -d --depth   depth
+    -d --depth   depth (need number)
     -c --nocolor no colors
     -v --verbose show flags and etc.
        --desc    show descriptions.
@@ -67,6 +81,13 @@ $help=<<<HELP
        --mask    add masks in /etc/portage/package.mask
 
        --test    run Emerge for test (-p --exec)
+
+Emerge:
+run `emerge -p EMERGE_TEST EMERGE atoms` for test
+run `emerge    EMERGE_SETUP EMERGE atoms` for setup
+    --emerge=""
+    --emerge-test="{$_EMERGE_TEST}"
+    --emerge-setup="{$_EMERGE_SETUP}"
 
 HELP;
 	die($help);
@@ -130,11 +151,11 @@ function text($level=0, $start=0)
 			$_p=$_pkgs_all[$y];
 			if (isset($_result[$y]) && $_result[$y]>0)
 			{
-				if ($_result[$y]==3) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[31m":'').'# '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[96m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[93m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[95m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
-				else if ($_result[$y]==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[91m":'').'! '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[96m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[93m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[95m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
-				else if ($_result[$y]==1) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32m":'').'+ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[96m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[93m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[95m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
+				if ($_result[$y]==3) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[31m":'').'# '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
+				else if ($_result[$y]==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[31m":'').'! '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
+				else if ($_result[$y]==1) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32m":'').'+ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
 			}
-			else if ($status==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[92m":'').'@ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[96m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[93m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[95m":' ').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
+			else if ($status==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32m":'').'@ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":' ').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
 			else if ($_FULLTREE && ($_DEPTH==0 || ($_DEPTH>0 && $_DEPTH>=$_p[0]))) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).'- '.$_p[1]."\n";
 		}
 	}
@@ -231,7 +252,7 @@ result();
 if ($_ONLYPK)
 {
 	command();
-	$_command='emerge -pe --unordered-display --color=y --autounmask=n'.$_command.$_command_ex;
+	$_command='emerge -p '.$_EMERGE_TEST.' '.$_command.$_command_ex;
 	print $_command."\n\n";
 	if ($_EXEC) system($_command);
 	die();
@@ -240,7 +261,7 @@ if ($_ONLYPK)
 if ($_EXEC)
 {
 	command();
-	$_command='emerge --color=y --autounmask=y'.$_command.$_command_ex;
+	$_command='emerge '.$_EMERGE_SETUP.' '.$_command.$_command_ex;
 	system($_command);
 	die();
 }
