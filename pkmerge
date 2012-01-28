@@ -3,59 +3,106 @@
 $_DIR = '/var/tmp/pkscript';
 $_FILE = 'pks'.@date('ymd-H-i-s');
 //////////////////////////////////
+if (!defined('__DIR__')) define('__DIR__', dirname(__FILE__)); // for PHP<5.3
+require_once(__DIR__.'/includes/getopt.php');
+require_once(__DIR__.'/includes/portageq.class.php');
+require_once(__DIR__.'/includes/global.php');
 
 $_HELP=false;
 $_DESC=false;
-$_atoms=$_SERVER['argv'];
+$_FIND=array();
+$_EMERGE='';
+$_EMERGE_CMD='--autounmask=y --color=n --tree --unordered-display';
+$_atoms=array();
 
-$_args=getopt('hd', array('help','desc'));
+$_args=_getopt('hd', array('help','desc','find::','emerge::','emerge-cmd::'));
+if ($_args === false) die("Error parse arguments!\n");
 foreach ($_args as $arg => $val)
 {
 	switch ($arg)
 	{
 		case 'h':
-			while (($i=array_search('-h', $_atoms) !== false)) unset($_atoms[$i]);
 		case 'help':
-			while (($i=array_search('--help', $_atoms) !== false)) unset($_atoms[$i]);
 			$_HELP=true; break;
 		case 'd':
-			while (($i=array_search('-d', $_atoms) !== false)) unset($_atoms[$i]);
 		case 'desc':
-			while (($i=array_search('--desc', $_atoms) !== false)) unset($_atoms[$i]);
 			$_DESC=true; break;
-		default: $_atoms.=' '.$arg;
+		//case 'desc-no-line': Need?
+		//	$_DESC=true; break;
+		case 'find':
+			if (is_array($val)) $_FIND=$val;
+			else $_FIND[]=$val;
+			break;
+		case 'emerge':
+			if (is_array($val)) $_EMERGE=implode(' ', $val);
+			else $_EMERGE=$val;
+			break;
+		case 'emerge-cmd':
+			if (is_array($val)) $_EMERGE_CMD=implode(' ', $val);
+			else $_EMERGE_CMD=$val;
+			break;
+		case '-':
+			if (is_array($val)) $_atoms=$val;
+			else $_atoms[]=$val;
+			break;
 	}
 }
-unset($_atoms[0]);
-$_atoms=implode(' ', $_atoms);
 
-if ($_HELP || empty($_atoms))
+for ($x=count($_FIND)-1; $x>=0; $x--)
+{
+	if (!preg_match("/^\S+\/\S+$/", $_FIND[$x]))
+	{
+		print "Error argument: --find=\"{$_FIND[$x]}\"\n";
+		unset($_FIND[$x]);
+	}
+}
+
+foreach ($_FIND as $atom)
+{
+	print "\n$atom\n";
+	$atomInfo=atomInfo($atom, false) or die("Error: Not found!\n");
+	foreach ($atomInfo as $a)
+		$_atoms[]=$a['category'].'/'.$a['name'];//.'-'.$a['version'];
+}
+
+if ($_HELP || count($_atoms)==0)
 {
 $help=<<<HELP
 pkmerge: Custom installation of packages.
 Usage:
-    pkmerge [-h|--help] [-d|--desc] (emerge arguments)
+    pkmerge [-h|--help] [-d|--desc] [-f|--find] [--emerge] [--emerge-cmd] (atoms)
 
     -h --help    this help
     -d --desc    get description for packages
+
+       --find="category/package" for `find` packages
+
+Atoms: It's all types for emerge.
+
+Emerge: run `emerge -p EMERGE_CMD EMERGE atoms`
+    --emerge=""
+    --emerge-cmd="{$_EMERGE_CMD}"
+
+category/package: can use ? or *
+    pkmerge --find="media*/*font*" --find="app-misc/*"
+WARNING: category/package must be in quotes (" " or ' ')
 
 HELP;
 	die($help);
 }
 
 $emerge = array();
-exec('emerge -pe --color=n --tree --unordered-display '.$_atoms.' |& cat', $emerge);
+$emerge_cmd = "emerge -p $_EMERGE_CMD $_EMERGE ";
+foreach ($_atoms as $atom) $emerge_cmd.=escapeshellarg($atom).' ';
+exec("$emerge_cmd |& cat", $emerge);
 print implode("\n", $emerge);
-
-require_once(__DIR__.'/includes/portageq.class.php');
-require_once(__DIR__.'/includes/global.php');
 
 @mkdir($_DIR);
 
 $fscript = @fopen($_DIR.'/'.$_FILE, 'w+');
 if (!$fscript) die("$_DIR/$_FILE not created!\n");
 
-$args = implode(' ', $_SERVER['argv']);
+$args = escapeshellcmd(implode(' ', $_SERVER['argv']));
 $hcode = <<<CODE
 #!/usr/bin/php
 <?php
