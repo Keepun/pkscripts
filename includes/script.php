@@ -153,9 +153,9 @@ function text($level=0, $start=0)
 			{
 				if ($_result[$y]==3) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[31m":'').'# '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
 				else if ($_result[$y]==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[31m":'').'! '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
-				else if ($_result[$y]==1) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32m":'').'+ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
+				else if ($_result[$y]==1) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32;01m":'').'+ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":'').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
 			}
-			else if ($status==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32m":'').'@ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":' ').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
+			else if ($status==2) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).($_COLOR?"\033[32;01m":'').'@ '.$_p[1].($_VERBOSE && $_p[0]>1?($_COLOR?" \033[36m":' ').$_pkgs_all[$start-1][1].($_COLOR?" \033[33m":' ').findDepens($_pkgs_all[$start-1][1],$_p[1]):'').($_DESC?($_COLOR?" \033[35m":' ').pmetadata($_p[1],'DESCRIPTION'):'').($_COLOR?"\033[0m":'')."\n";
 			else if ($_FULLTREE && ($_DEPTH==0 || ($_DEPTH>0 && $_DEPTH>=$_p[0]))) print $_p[0].str_repeat('.', $_p[0]-strlen($_p[0])).'- '.$_p[1]."\n";
 		}
 	}
@@ -262,6 +262,7 @@ if ($_EXEC)
 {
 	command();
 	$_command='emerge '.$_EMERGE_SETUP.' '.$_command.$_command_ex;
+	print $_command."\n\n";
 	system($_command);
 	die();
 }
