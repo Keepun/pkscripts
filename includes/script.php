@@ -12,12 +12,12 @@ $_DESC=false;
 $_EXEC=false;
 $_NEWFILE=false;
 $_ONLYPK=false;
-$_MASK=false;
+$_MASK=0;
 $_EMERGE='';
 $_EMERGE_TEST='--unordered-display --color=y --autounmask=y';
 $_EMERGE_SETUP='--color=y --autounmask=y';
 
-$_args=getopt('hfd::cvnp', array('help','full','depth::','nocolor','verbose','desc','exec','new','pk','mask','test','emerge::','emerge-test::','emerge-setup::'));
+$_args=getopt('hfd::cvnp', array('help','full','depth::','nocolor','verbose','desc','exec','new','pk','mask','mask-ver','test','emerge::','emerge-test::','emerge-setup::'));
 foreach ($_args as $arg => $val)
 {
 	switch ($arg)
@@ -48,7 +48,9 @@ foreach ($_args as $arg => $val)
 		case 'pk':
 			$_ONLYPK=true; break;
 		case 'mask':
-			$_MASK=true; break;
+			$_MASK=1; break;
+		case 'mask-ver':
+			$_MASK=2; break;
 		case 'test':
 			$_ONLYPK=true; $_EXEC=true; break;
 		case 'emerge':
@@ -78,7 +80,8 @@ $help=<<<HELP
     -n --new     new script from this
     -p --pk      only \$pk for Emerge
        --exec    run Emerge
-       --mask    add masks in /etc/portage/package.mask
+       --mask    show masks
+       --mask-ver show masks with version
 
        --test    run Emerge for test (-p --exec)
 
@@ -198,14 +201,23 @@ function command($level=0, $start=0)
 	return $y;
 }
 
-if ($_MASK)
+if ($_MASK > 0)
 {
-	@mkdir('/etc/portage', 755);
 	foreach ($pk as $_pk)
 		foreach ($_pk as $k => $_p)
 	{
-		if ($k == 'M') system("echo \">=$_p\" >> /etc/portage/package.mask");
+		if ($k == 'M')
+		{
+			if ($_MASK == 1)
+			{
+				if (($info = atomInfo($_p)) === false) continue;
+				print $info['category'].'/'.$info['name']."\n";
+			}
+			else
+				print ">=$_p\n";
+		}
 	}
+	die();
 }
 
 if ($_NEWFILE)
