@@ -1,0 +1,463 @@
+Setup =gnome-base/gnome-3.2.1
+
+console# emerge --version
+Portage 2.1.10.41
+
+/////////////////
+If to mask under the version emerge takes the previous version:
+
+console# ACCEPT_KEYWORDS="~x86" emerge -p =gnome-base/gnome-3.2.1 |& grep games
+[ebuild  N     ] games-board/aisleriot-3.2.2
+
+console# echo ">=games-board/aisleriot-3.2.2" >> /etc/portage/package.mask
+
+console# ACCEPT_KEYWORDS="~x86" emerge -p =gnome-base/gnome-3.2.1 |& grep games
+[ebuild  N     ] games-board/aisleriot-3.2.1
+/////////////////
+
+console# eselect profile set 4
+console# eselect profile list
+Available profile symlink targets:
+  [4]   default/linux/x86/10.0/desktop/gnome *
+
+First, you need to install X:
+console# emerge -pv x11-base/xorg-x11
+or only the server
+console# emerge -pv x11-base/xorg-server
+
+At the moment of creation this demonstration, gnome-3.2.1 is marked by flags instability for amd64 and x86
+I recommend to execution, but only one times:
+console# emerge --autounmask-write=y =gnome-base/gnome-3.2.1
+console# dispatch-conf (or etc-update)
+
+That the future updates too were setup:
+console# sed "s/^=/>=/" /etc/portage/package.accept_keywords > /etc/portage/package.accept_keywords_new
+console# mv /etc/portage/package.accept_keywords_new /etc/portage/package.accept_keywords
+
+
+Now emerge will allow to setup =gnome-base/gnome-3.2.1 :)
+
+It is possible to cut this list of packages at once (to a wish, but I won't do it):
+	accessibility? (
+		>=app-accessibility/at-spi2-atk-2.2.1
+		>=app-accessibility/at-spi2-core-2.2.1
+		>=app-accessibility/caribou-0.4.1
+		>=app-accessibility/orca-${PV}
+		>=gnome-extra/mousetweaks-${PV} )
+Adding a flag -accessibility in package.use:
+console# echo ">=gnome-base/gnome-3.2.1 -accessibility" >> /etc/portage/package.use
+
+
+The fastest
+./pkmerge =gnome-base/gnome-3.2.1
+Full tree of dependences
+./pkmerge =gnome-base/gnome-3.2.1 --emerge="-e"
+With descriptions of packages (long)
+./pkmerge =gnome-base/gnome-3.2.1 --desc
+Full tree of dependences with descriptions of packages (even longer)
+./pkmerge =gnome-base/gnome-3.2.1 --desc --emerge="-e"
+
+console# ./pkmerge =gnome-base/gnome-3.2.1
+
+These are the packages that would be merged:
+
+Calculating dependencies  ..... done!
+[ebuild  N    ~] gnome-base/gnome-3.2.1  USE="cdr cups extras fallback -accessibility"
+[ebuild  N    ~]  gnome-base/gnome-shell-3.2.2.1  USE="bluetooth networkmanager"
+[ebuild  N     ]   gnome-base/gnome-common-3.1.0
+[ebuild  N     ]   net-libs/libsoup-2.36.1  USE="introspection ssl -debug -doc -samba -test"
+[ebuild  N     ]    dev-libs/gobject-introspection-1.30.0-r2  USE="-doc -test"
+..............
+[ebuild  N    ~]  gnome-base/gnome-applets-3.2.1  USE="gnome ipv6 policykit -networkmanager"
+[ebuild  N    ~]  gnome-base/gdm-3.2.1.1-r2  USE="consolekit fallback gnome-keyring gnome-shell introspection ipv6 tcpd xklavier -accessibility -debug -fprint (-selinux) -smartcard -test -xinerama"
+[ebuild  N     ]   x11-apps/xhost-1.0.4  USE="ipv6"
+[ebuild  N     ]   x11-apps/sessreg-1.0.7
+[ebuild  N     ]  x11-themes/gnome-icon-theme-extras-3.0.0gnome-base/gnome-3.2.1:
+gnome-base/gnome-shell-3.2.2.1:
+gnome-base/gnome-common-3.1.0:
+net-libs/libsoup-2.36.1:
+dev-libs/gobject-introspection-1.30.0-r2:
+x11-libs/cairo-1.10.2-r1:
+..............
+gnome-base/gnome-applets-3.2.1:
+gnome-base/gdm-3.2.1.1-r2:
+x11-apps/xhost-1.0.4:
+x11-apps/sessreg-1.0.7:
+x11-themes/gnome-icon-theme-extras-3.0.0:
+
+Edit /var/tmp/pkscript/pks120202-02-55-34
+
+console# /var/tmp/pkscript/pks120202-02-55-34
+S gnome-base/gnome-3.2.1
+
+1+ gnome-base/gnome-3.2.1
+
+console# nano /var/tmp/pkscript/pks120202-02-55-34
+//// $pk[][S-setup or E|M-exclude]
+//// Delete # where need.
+ $pk[][S]=/**/"gnome-base/gnome-3.2.1";
+ $pk[][M]=/*||*/"net-im/empathy-3.2.2";
+ $pk[][M]=/*|||*/"media-video/cheese-3.2.2";
+ $pk[][M]=/*||||*/"media-video/gnome-video-effects-0.3.0";
+ $pk[][M]=/*|||*/"net-im/telepathy-connection-managers-1";
+ $pk[][M]=/*||*/"media-video/totem-3.2.1";
+ $pk[][M]=/*||*/"app-cdr/brasero-3.2.0-r1";
+ $pk[][M]=/*||*/"media-sound/sound-juicer-2.99.0_pre20111001";
+ $pk[][M]=/*||*/"app-misc/tracker-9999";
+ $pk[][M]=/*||*/"net-misc/vino-3.2.2";
+ $pk[][M]=/*||*/"gnome-extra/gnome-documents-0.2.1";
+ $pk[][M]=/*||*/"www-client/epiphany-3.2.1";
+ $pk[][M]=/*||*/"mail-client/evolution-3.2.2";
+ $pk[][M]=/*||*/"net-misc/vinagre-3.2.2";
+ $pk[][M]=/*||*/"games-board/aisleriot-3.2.2";
+ $pk[][M]=/*||*/"gnome-extra/gnome-games-3.2.1-r1";
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --desc
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M net-misc/vino-3.2.2
+M gnome-extra/gnome-documents-0.2.1
+M www-client/epiphany-3.2.1
+M mail-client/evolution-3.2.2
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+1! gnome-base/gnome-3.2.1 Meta package for GNOME 3, merge this package to install
+2.! gnome-base/gnome-shell-3.2.2.1 Provides core UI functions for the GNOME 3 desktop
+3..@ gnome-base/gnome-common-3.1.0 Common files for development of Gnome packages
+3..@ net-libs/libsoup-2.36.1 An HTTP library implementation in C
+3..@ net-libs/telepathy-glib-0.16.3 GLib bindings for the Telepathy D-Bus protocol.
+3..! gnome-extra/evolution-data-server-3.2.3 Evolution groupware backend
+4...@ dev-libs/nspr-4.8.9 Netscape Portable Runtime
+4...@ dev-libs/libical-0.43 a implementation of basic iCAL protocols from citadel, previously known as aurore.
+4...@ gnome-base/gconf-2.32.4 Gnome Configuration System and Daemon
+4...@ net-libs/liboauth-0.9.6 C library implementing the OAuth secure authentication protocol
+4...@ dev-libs/libgweather-3.2.1 Library to access weather information from online services
+4...@ dev-libs/libgdata-0.10.1 GLib-based library for accessing online service APIs using the GData protocol
+4...! net-libs/gnome-online-accounts-3.2.1 GNOME framework for accessing online accounts
+5....@ dev-util/gdbus-codegen-2.30.2 GDBus code and documentation generator
+5....@ net-libs/rest-0.7.12 Helper library for RESTful services
+5....! gnome-base/gnome-control-center-3.2.2 GNOME Desktop Configuration Tool
+6.....@ app-text/iso-codes-3.30 Provides the list of country and language names
+6.....@ x11-libs/libxklavier-5.1 High level XKB library
+6.....@ gnome-base/gnome-desktop-3.2.1 Libraries for the gnome desktop that are not part of the UI
+6.....@ x11-libs/libXxf86misc-1.0.3 X.Org Xxf86misc library
+6.....@ gnome-base/libgnomekbd-3.2.0-r1 Gnome keyboard configuration library
+6.....@ media-libs/libcanberra-0.28-r5 Portable Sound Event Library
+6.....@ net-libs/libsocialweb-0.25.20 Social web services integration framework
+6.....# media-video/cheese-3.2.2 A cheesy program to take pictures and videos from your webcam
+7......# media-video/gnome-video-effects-0.3.0 Effects for Cheese, the webcam video and picture application
+6.....@ net-print/cups-pk-helper-0.2.1 PolicyKit helper to configure cups with fine-grained privileges
+6.....@ app-admin/apg-2.3.0b-r5 Another Password Generator
+6.....@ gnome-base/gnome-session-3.2.1-r1 Gnome session manager
+6.....@ gnome-extra/nm-applet-0.9.2.0-r1 GNOME applet for NetworkManager
+6.....@ sys-apps/accountsservice-0.6.15 D-Bus interfaces for querying and manipulating user account information
+6.....@ gnome-base/gnome-menus-3.2.0.1-r1 The GNOME menu system, implementing the F.D.O cross-desktop spec
+6.....@ x11-apps/xmodmap-1.0.5 utility for modifying keymaps and pointer button mappings in X
+6.....@ gnome-base/libgtop-2.28.4 A library that provides top functionality to applications
+5....@ net-libs/webkit-gtk-1.6.1-r301 Open source web browser engine
+3..@ x11-wm/mutter-3.2.2 GNOME 3 compositing window manager based on Clutter
+3..@ dev-libs/gjs-1.30.1 Javascript bindings for GNOME
+3..@ app-accessibility/caribou-0.4.1 Input assistive technology intended for switch and pointer users
+3..@ x11-apps/mesa-progs-8.0.1 Mesa's OpenGL utility and demo programs (glxgears and glxinfo)
+3..@ dev-libs/folks-0.6.6 libfolks is a library that aggregates people from multiple sources
+3..@ net-im/telepathy-logger-0.2.12 Telepathy Logger is a session daemon that should be activated whenever telepathy is being used.
+2.@ gnome-base/gvfs-1.10.1 GNOME Virtual Filesystem Layer
+2.! gnome-base/gnome-core-apps-3.2.1 Sub-meta package for the core applications integrated with GNOME 3
+3..@ app-editors/gedit-3.2.6 A text editor for the GNOME desktop
+3..@ gnome-extra/gnome-power-manager-3.2.1 Gnome Power Manager
+3..# net-im/empathy-3.2.2 Telepathy client and library using GTK+
+4...# net-im/telepathy-connection-managers-1 Meta-package for Telepathy Connection Managers
+3..@ x11-terms/gnome-terminal-3.2.1 The Gnome Terminal
+3..@ gnome-extra/gnome-screensaver-3.2.0 Replaces xscreensaver, integrating with the desktop.
+3..@ gnome-extra/gnome-user-docs-3.2.1 GNOME end user documentation
+3..@ media-gfx/eog-3.2.2 The Eye of GNOME image viewer
+3..@ gnome-base/gnome-core-libs-3.2.1 Sub-meta package for the core libraries of GNOME 3
+3..@ gnome-extra/yelp-3.2.1 Help browser for GNOME
+3..@ gnome-extra/gnome-contacts-3.2.2 GNOME contact management application
+3..@ app-crypt/seahorse-3.2.2 A GNOME application for managing encryption keys
+3..# media-video/totem-3.2.1 Media player for GNOME
+3..# app-cdr/brasero-3.2.0-r1 Brasero (aka Bonfire) is yet another application to burn CD/DVD for the gnome desktop.
+2.@ gnome-base/gnome-fallback-3.2.1 Sub-meta package for GNOME 3 fallback mode
+2.! gnome-base/gnome-extra-apps-3.2.1 Sub-meta package for the applications of GNOME 3
+3..@ app-misc/tracker-0.12.9 A tagging metadata database, search tool and indexer
+3..# net-misc/vinagre-3.2.2 VNC Client for the GNOME Desktop
+3..# net-misc/vino-3.2.2 An integrated VNC server for GNOME
+3..@ gnome-extra/gnome-tweak-tool-3.2.2-r2 Tool to customize GNOME 3 options
+3..@ app-arch/file-roller-3.2.1 Archive manager for GNOME
+3..# www-client/epiphany-3.2.1 GNOME webbrowser based on Webkit
+3..# media-sound/sound-juicer-2.99.0_pre20111001 CD ripper for GNOME
+3..# gnome-extra/gnome-documents-0.2.1 GNOME document manager
+3..# games-board/aisleriot-3.2.2 A collection of solitaire card games for GNOME
+3..@ gnome-extra/gnome-utils-3.2.1 Utilities for the Gnome desktop
+3..# gnome-extra/gnome-games-3.2.1-r1 Collection of games for the GNOME desktop
+3..@ gnome-extra/gnome-system-monitor-3.2.1 The Gnome System Monitor
+3..@ net-analyzer/gnome-nettool-3.0.1 Collection of network tools
+3..@ media-gfx/shotwell-0.11.6 Open source photo manager for GNOME
+3..@ gnome-extra/gconf-editor-3.0.1 An editor to the GNOME 2 config system
+3..@ gnome-extra/gucharmap-3.2.2 Unicode character map viewer and library
+3..@ gnome-extra/gcalctool-6.2.0 A calculator application for GNOME
+2.@ x11-themes/gnome-backgrounds-3.2.0 A set of backgrounds packaged with the GNOME desktop
+2.@ gnome-base/gnome-applets-3.2.1 Applets for the GNOME Desktop and Panel
+2.@ gnome-base/gdm-3.2.1.1-r2 GNOME Display Manager
+2.@ x11-themes/gnome-icon-theme-extras-3.0.0 GNOME 2 icon theme extras
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --test
+......
+(dependency required by "gnome-base/gnome-control-center-3.2.2[cheese]" [ebuild])
+(dependency required by "gnome-base/gnome-shell-3.2.2.1" [ebuild])
+(dependency required by "gnome-base/gdm-3.2.1.1-r2[gnome-shell]" [ebuild])
+(dependency required by "=gnome-base/gdm-3.2.1.1-r2" [argument])
+For more information, see the MASKED PACKAGES section in the emerge
+man page or refer to the Gentoo Handbook.
+
+console# echo "gnome-base/gnome-control-center -cheese" >> /etc/portage/package.use
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --test
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M net-misc/vino-3.2.2
+M gnome-extra/gnome-documents-0.2.1
+M www-client/epiphany-3.2.1
+M mail-client/evolution-3.2.2
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+emerge -p --unordered-display --color=y --autounmask=y  =gnome-base/gnome-common-3.1.0 =net-libs/libsoup-2.36.1 =net-libs/telepathy-glib-0.16.3 =dev-libs/nspr-4.8.9 =dev-libs/libical-0.43 =gnome-base/gconf-2.32.4 =net-libs/liboauth-0.9.6 =dev-libs/libgweather-3.2.1 =dev-libs/libgdata-0.10.1 =dev-util/gdbus-codegen-2.30.2 =net-libs/rest-0.7.12 =app-text/iso-codes-3.30 =x11-libs/libxklavier-5.1 =gnome-base/gnome-desktop-3.2.1 =x11-libs/libXxf86misc-1.0.3 =gnome-base/libgnomekbd-3.2.0-r1 =media-libs/libcanberra-0.28-r5 =net-libs/libsocialweb-0.25.20 =net-print/cups-pk-helper-0.2.1 =app-admin/apg-2.3.0b-r5 =gnome-base/gnome-session-3.2.1-r1 =gnome-extra/nm-applet-0.9.2.0-r1 =sys-apps/accountsservice-0.6.15 =gnome-base/gnome-menus-3.2.0.1-r1 =x11-apps/xmodmap-1.0.5 =gnome-base/libgtop-2.28.4 =net-libs/webkit-gtk-1.6.1-r301 =x11-wm/mutter-3.2.2 =dev-libs/gjs-1.30.1 =app-accessibility/caribou-0.4.1 =x11-apps/mesa-progs-8.0.1 =dev-libs/folks-0.6.6 =net-im/telepathy-logger-0.2.12 =gnome-base/gvfs-1.10.1 =app-editors/gedit-3.2.6 =gnome-extra/gnome-power-manager-3.2.1 =x11-terms/gnome-terminal-3.2.1 =gnome-extra/gnome-screensaver-3.2.0 =gnome-extra/gnome-user-docs-3.2.1 =media-gfx/eog-3.2.2 =gnome-base/gnome-core-libs-3.2.1 =gnome-extra/yelp-3.2.1 =gnome-extra/gnome-contacts-3.2.2 =app-crypt/seahorse-3.2.2 =gnome-base/gnome-fallback-3.2.1 =app-misc/tracker-0.12.9 =gnome-extra/gnome-tweak-tool-3.2.2-r2 =app-arch/file-roller-3.2.1 =gnome-extra/gnome-utils-3.2.1 =gnome-extra/gnome-system-monitor-3.2.1 =net-analyzer/gnome-nettool-3.0.1 =media-gfx/shotwell-0.11.6 =gnome-extra/gconf-editor-3.0.1 =gnome-extra/gucharmap-3.2.2 =gnome-extra/gcalctool-6.2.0 =x11-themes/gnome-backgrounds-3.2.0 =gnome-base/gnome-applets-3.2.1 =gnome-base/gdm-3.2.1.1-r2 =x11-themes/gnome-icon-theme-extras-3.0.0 --exclude media-video/cheese --exclude media-video/gnome-video-effects --exclude net-im/empathy --exclude net-im/telepathy-connection-managers --exclude media-video/totem --exclude app-cdr/brasero --exclude net-misc/vinagre --exclude net-misc/vino --exclude www-client/epiphany --exclude media-sound/sound-juicer --exclude gnome-extra/gnome-documents --exclude games-board/aisleriot --exclude gnome-extra/gnome-games
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies  ... done!
+[ebuild  N     ] sys-apps/pciutils-3.1.7  USE="-network-cron -zlib"
+[ebuild  N     ] app-text/libpaper-1.1.23
+[ebuild  N     ] media-gfx/shared-color-profiles-0.1.4
+[ebuild  N     ] app-text/poppler-data-0.4.4
+[ebuild  N    ~] app-crypt/p11-kit-0.10  USE="-debug"
+..............
+[ebuild  N    ~] gnome-base/gnome-applets-3.2.1  USE="gnome ipv6 policykit -networkmanager"
+[ebuild  N    ~] gnome-extra/gnome-tweak-tool-3.2.2-r2
+[ebuild  N    ~] gnome-base/gdm-3.2.1.1-r2  USE="consolekit fallback gnome-keyring gnome-shell introspection ipv6 tcpd xklavier -accessibility -debug -fprint (-selinux) -smartcard -test -xinerama"
+[ebuild  N    ~] app-misc/tracker-0.12.9  USE="eds exif flac gif gnome-keyring gstreamer gtk jpeg mp3 nautilus pdf tiff vorbis xml (-applet) -doc -firefox-bookmarks -flickr -gsf -iptc -laptop -networkmanager -playlist -rss -test -thunderbird -upnp -xine -xmp"
+[ebuild  N    ~] gnome-extra/nautilus-tracker-tags-0.12.9
+
+OK :)
+
+Unnecessary packages are desirable for mask, that emerge them "casually" has not setup without any warning.
+The difference between --mask and --mask-ver (with version) for emerge is shown at the top.
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --mask
+net-im/empathy
+media-video/cheese
+media-video/gnome-video-effects
+net-im/telepathy-connection-managers
+media-video/totem
+app-cdr/brasero
+media-sound/sound-juicer
+app-misc/tracker
+net-misc/vino
+gnome-extra/gnome-documents
+www-client/epiphany
+mail-client/evolution
+net-misc/vinagre
+games-board/aisleriot
+gnome-extra/gnome-games
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --mask >> /etc/portage/package.mask
+
+Now you can get a new tree.
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --new
+New script /var/tmp/pkscript/pks120202-03-19-49
+
+console# /var/tmp/pkscript/pks120202-03-19-49
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M mail-client/evolution-3.2.3
+M net-misc/vino-3.2.2
+M www-client/epiphany-3.2.1
+M gnome-extra/gnome-documents-0.2.1
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+1! gnome-base/gnome-3.2.1
+2.@ gnome-base/gnome-shell-3.2.2.1
+2.@ gnome-base/gvfs-1.10.1
+2.! gnome-base/gnome-core-apps-3.2.1
+3..@ app-editors/gedit-3.2.6
+3..@ gnome-extra/gnome-power-manager-3.2.1
+3..# net-im/empathy-3.2.2
+4...# media-video/cheese-3.2.2
+5....# media-video/gnome-video-effects-0.3.0
+4...# net-im/telepathy-connection-managers-1
+3..@ x11-terms/gnome-terminal-3.2.1
+3..@ gnome-extra/gnome-screensaver-3.2.0
+3..@ gnome-extra/gnome-user-docs-3.2.1
+3..@ media-gfx/eog-3.2.2
+3..@ gnome-base/gnome-core-libs-3.2.1
+3..@ gnome-extra/yelp-3.2.1
+3..@ gnome-extra/gnome-contacts-3.2.2
+3..@ app-crypt/seahorse-3.2.2
+3..# media-video/totem-3.2.1
+3..# app-cdr/brasero-3.2.0-r1
+2.@ gnome-base/gnome-fallback-3.2.1
+2.! gnome-base/gnome-extra-apps-3.2.1
+3..# media-sound/sound-juicer-2.99.0_pre20111001
+3..# app-misc/tracker-9999
+4...# mail-client/evolution-3.2.3
+3..# net-misc/vino-3.2.2
+3..@ gnome-extra/gnome-tweak-tool-3.2.2-r2
+3..@ app-arch/file-roller-3.2.1
+3..# www-client/epiphany-3.2.1
+3..# gnome-extra/gnome-documents-0.2.1
+3..# net-misc/vinagre-3.2.2
+3..# games-board/aisleriot-3.2.2
+3..@ gnome-extra/gnome-utils-3.2.1
+3..# gnome-extra/gnome-games-3.2.1-r1
+3..@ gnome-extra/gnome-system-monitor-3.2.1
+3..@ net-analyzer/gnome-nettool-3.0.1
+3..@ media-gfx/shotwell-0.11.6
+3..@ gnome-extra/gconf-editor-3.0.1
+3..@ gnome-extra/gucharmap-3.2.2
+3..@ gnome-extra/gcalctool-6.2.0
+2.@ x11-themes/gnome-backgrounds-3.2.0
+2.@ gnome-base/gnome-applets-3.2.1
+2.@ gnome-base/gdm-3.2.1.1-r2
+2.@ x11-themes/gnome-icon-theme-extras-3.0.0
+
+console# /var/tmp/pkscript/pks120202-03-19-49 --desc
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M mail-client/evolution-3.2.3
+M net-misc/vino-3.2.2
+M www-client/epiphany-3.2.1
+M gnome-extra/gnome-documents-0.2.1
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+1! gnome-base/gnome-3.2.1 Meta package for GNOME 3, merge this package to install
+2.@ gnome-base/gnome-shell-3.2.2.1 Provides core UI functions for the GNOME 3 desktop
+2.@ gnome-base/gvfs-1.10.1 GNOME Virtual Filesystem Layer
+2.! gnome-base/gnome-core-apps-3.2.1 Sub-meta package for the core applications integrated with GNOME 3
+3..@ app-editors/gedit-3.2.6 A text editor for the GNOME desktop
+3..@ gnome-extra/gnome-power-manager-3.2.1 Gnome Power Manager
+3..# net-im/empathy-3.2.2 Telepathy client and library using GTK+
+4...# media-video/cheese-3.2.2 A cheesy program to take pictures and videos from your webcam
+5....# media-video/gnome-video-effects-0.3.0 Effects for Cheese, the webcam video and picture application
+4...# net-im/telepathy-connection-managers-1 Meta-package for Telepathy Connection Managers
+3..@ x11-terms/gnome-terminal-3.2.1 The Gnome Terminal
+3..@ gnome-extra/gnome-screensaver-3.2.0 Replaces xscreensaver, integrating with the desktop.
+3..@ gnome-extra/gnome-user-docs-3.2.1 GNOME end user documentation
+3..@ media-gfx/eog-3.2.2 The Eye of GNOME image viewer
+3..@ gnome-base/gnome-core-libs-3.2.1 Sub-meta package for the core libraries of GNOME 3
+3..@ gnome-extra/yelp-3.2.1 Help browser for GNOME
+3..@ gnome-extra/gnome-contacts-3.2.2 GNOME contact management application
+3..@ app-crypt/seahorse-3.2.2 A GNOME application for managing encryption keys
+3..# media-video/totem-3.2.1 Media player for GNOME
+3..# app-cdr/brasero-3.2.0-r1 Brasero (aka Bonfire) is yet another application to burn CD/DVD for the gnome desktop.
+2.@ gnome-base/gnome-fallback-3.2.1 Sub-meta package for GNOME 3 fallback mode
+2.! gnome-base/gnome-extra-apps-3.2.1 Sub-meta package for the applications of GNOME 3
+3..# media-sound/sound-juicer-2.99.0_pre20111001 CD ripper for GNOME
+3..# app-misc/tracker-9999 A tagging metadata database, search tool and indexer
+4...# mail-client/evolution-3.2.3 Integrated mail, addressbook and calendaring functionality
+3..# net-misc/vino-3.2.2 An integrated VNC server for GNOME
+3..@ gnome-extra/gnome-tweak-tool-3.2.2-r2 Tool to customize GNOME 3 options
+3..@ app-arch/file-roller-3.2.1 Archive manager for GNOME
+3..# www-client/epiphany-3.2.1 GNOME webbrowser based on Webkit
+3..# gnome-extra/gnome-documents-0.2.1 GNOME document manager
+3..# net-misc/vinagre-3.2.2 VNC Client for the GNOME Desktop
+3..# games-board/aisleriot-3.2.2 A collection of solitaire card games for GNOME
+3..@ gnome-extra/gnome-utils-3.2.1 Utilities for the Gnome desktop
+3..# gnome-extra/gnome-games-3.2.1-r1 Collection of games for the GNOME desktop
+3..@ gnome-extra/gnome-system-monitor-3.2.1 The Gnome System Monitor
+3..@ net-analyzer/gnome-nettool-3.0.1 Collection of network tools
+3..@ media-gfx/shotwell-0.11.6 Open source photo manager for GNOME
+3..@ gnome-extra/gconf-editor-3.0.1 An editor to the GNOME 2 config system
+3..@ gnome-extra/gucharmap-3.2.2 Unicode character map viewer and library
+3..@ gnome-extra/gcalctool-6.2.0 A calculator application for GNOME
+2.@ x11-themes/gnome-backgrounds-3.2.0 A set of backgrounds packaged with the GNOME desktop
+2.@ gnome-base/gnome-applets-3.2.1 Applets for the GNOME Desktop and Panel
+2.@ gnome-base/gdm-3.2.1.1-r2 GNOME Display Manager
+2.@ x11-themes/gnome-icon-theme-extras-3.0.0 GNOME 2 icon theme extras
+
+Meta-packages are not needed for work, so it is possible to do without them :)
+console# /var/tmp/pkscript/pks120202-03-19-49 --desc | grep -i meta
+1! gnome-base/gnome-3.2.1 Meta package for GNOME 3, merge this package to install
+2.! gnome-base/gnome-core-apps-3.2.1 Sub-meta package for the core applications integrated with GNOME 3
+4...# net-im/telepathy-connection-managers-1 Meta-package for Telepathy Connection Managers
+3..@ gnome-base/gnome-core-libs-3.2.1 Sub-meta package for the core libraries of GNOME 3
+2.@ gnome-base/gnome-fallback-3.2.1 Sub-meta package for GNOME 3 fallback mode
+2.! gnome-base/gnome-extra-apps-3.2.1 Sub-meta package for the applications of GNOME 3
+
+console# /var/tmp/pkscript/pks120202-03-19-49 --test
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M mail-client/evolution-3.2.3
+M net-misc/vino-3.2.2
+M www-client/epiphany-3.2.1
+M gnome-extra/gnome-documents-0.2.1
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+emerge -p --unordered-display --color=y --autounmask=y  =gnome-base/gnome-shell-3.2.2.1 =gnome-base/gvfs-1.10.1 =app-editors/gedit-3.2.6 =gnome-extra/gnome-power-manager-3.2.1 =x11-terms/gnome-terminal-3.2.1 =gnome-extra/gnome-screensaver-3.2.0 =gnome-extra/gnome-user-docs-3.2.1 =media-gfx/eog-3.2.2 =gnome-base/gnome-core-libs-3.2.1 =gnome-extra/yelp-3.2.1 =gnome-extra/gnome-contacts-3.2.2 =app-crypt/seahorse-3.2.2 =gnome-base/gnome-fallback-3.2.1 =gnome-extra/gnome-tweak-tool-3.2.2-r2 =app-arch/file-roller-3.2.1 =gnome-extra/gnome-utils-3.2.1 =gnome-extra/gnome-system-monitor-3.2.1 =net-analyzer/gnome-nettool-3.0.1 =media-gfx/shotwell-0.11.6 =gnome-extra/gconf-editor-3.0.1 =gnome-extra/gucharmap-3.2.2 =gnome-extra/gcalctool-6.2.0 =x11-themes/gnome-backgrounds-3.2.0 =gnome-base/gnome-applets-3.2.1 =gnome-base/gdm-3.2.1.1-r2 =x11-themes/gnome-icon-theme-extras-3.0.0 --exclude net-im/empathy --exclude media-video/cheese --exclude media-video/gnome-video-effects --exclude net-im/telepathy-connection-managers --exclude media-video/totem --exclude app-cdr/brasero --exclude media-sound/sound-juicer --exclude app-misc/tracker --exclude mail-client/evolution --exclude net-misc/vino --exclude www-client/epiphany --exclude gnome-extra/gnome-documents --exclude net-misc/vinagre --exclude games-board/aisleriot --exclude gnome-extra/gnome-games
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies  . ..... done!
+[ebuild  N     ] sys-apps/pciutils-3.1.7  USE="-network-cron -zlib"
+[ebuild  N     ] app-text/libpaper-1.1.23
+[ebuild  N     ] app-text/poppler-data-0.4.4
+[ebuild  N    ~] app-crypt/p11-kit-0.10  USE="-debug"
+[ebuild  N     ] media-gfx/shared-color-profiles-0.1.4
+..............
+[ebuild  N    ~] gnome-extra/gnome-contacts-3.2.2
+[ebuild  N    ~] gnome-base/gnome-fallback-3.2.1  USE="cups"
+[ebuild  N    ~] gnome-base/gnome-applets-3.2.1  USE="gnome ipv6 policykit -networkmanager"
+[ebuild  N    ~] gnome-extra/gnome-tweak-tool-3.2.2-r2
+[ebuild  N    ~] gnome-base/gdm-3.2.1.1-r2  USE="consolekit fallback gnome-keyring gnome-shell introspection ipv6 tcpd xklavier -accessibility -debug -fprint (-selinux) -smartcard -test -xinerama"
+
+FINISH :)
+console# /var/tmp/pkscript/pks120202-03-19-49 --exec && shutdown -h now
+
+Go to sleep :)

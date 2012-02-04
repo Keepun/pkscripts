@@ -1,5 +1,11 @@
-Gentoo Package Script
+Gentoo Package Scripts
 
-Need PHP 5.3 or higher.
+Need a PHP 5
 
-Custom installation of packages.
+pkmerge - allows for custom installation packages.
+
+Demonstration pkmerge:
+./docs/demo-gnome3.html
+./docs/demo-gnome3.txt
+
+pkdesc - show description of packages.

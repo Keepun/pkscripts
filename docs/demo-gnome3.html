@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Setup GNOME 3</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body style="background-color: #000000; color: #ffffff">
+<pre>
+Setup =gnome-base/gnome-3.2.1
+
+console# emerge --version
+Portage 2.1.10.41
+
+/////////////////
+If to mask under the version emerge takes the previous version:
+
+console# ACCEPT_KEYWORDS="~x86" emerge -p =gnome-base/gnome-3.2.1 |& grep games
+[ebuild  N     ] games-board/aisleriot-3.2.2
+
+console# echo ">=games-board/aisleriot-3.2.2" >> /etc/portage/package.mask
+
+console# ACCEPT_KEYWORDS="~x86" emerge -p =gnome-base/gnome-3.2.1 |& grep games
+[ebuild  N     ] games-board/aisleriot-3.2.1
+/////////////////
+
+console# eselect profile set 4
+console# eselect profile list
+Available profile symlink targets:
+  [4]   default/linux/x86/10.0/desktop/gnome *
+
+First, you need to install X:
+console# emerge -pv x11-base/xorg-x11
+or only the server
+console# emerge -pv x11-base/xorg-server
+
+At the moment of creation this demonstration, gnome-3.2.1 is marked by flags instability for amd64 and x86
+I recommend to execution, but only one times:
+console# emerge --autounmask-write=y =gnome-base/gnome-3.2.1
+console# dispatch-conf (or etc-update)
+
+That the future updates too were setup:
+console# sed "s/^=/>=/" /etc/portage/package.accept_keywords > /etc/portage/package.accept_keywords_new
+console# mv /etc/portage/package.accept_keywords_new /etc/portage/package.accept_keywords
+
+
+Now emerge will allow to setup =gnome-base/gnome-3.2.1 :)
+
+It is possible to cut this list of packages at once (to a wish, but I won't do it):
+	accessibility? (
+		>=app-accessibility/at-spi2-atk-2.2.1
+		>=app-accessibility/at-spi2-core-2.2.1
+		>=app-accessibility/caribou-0.4.1
+		>=app-accessibility/orca-${PV}
+		>=gnome-extra/mousetweaks-${PV} )
+Adding a flag -accessibility in package.use:
+console# echo ">=gnome-base/gnome-3.2.1 -accessibility" >> /etc/portage/package.use
+
+
+The fastest
+./pkmerge =gnome-base/gnome-3.2.1
+Full tree of dependences
+./pkmerge =gnome-base/gnome-3.2.1 --emerge="-e"
+With descriptions of packages (long)
+./pkmerge =gnome-base/gnome-3.2.1 --desc
+Full tree of dependences with descriptions of packages (even longer)
+./pkmerge =gnome-base/gnome-3.2.1 --desc --emerge="-e"
+
+console# ./pkmerge =gnome-base/gnome-3.2.1
+
+These are the packages that would be merged:
+
+Calculating dependencies  ..... done!
+[ebuild  N    ~] gnome-base/gnome-3.2.1  USE="cdr cups extras fallback -accessibility"
+[ebuild  N    ~]  gnome-base/gnome-shell-3.2.2.1  USE="bluetooth networkmanager"
+[ebuild  N     ]   gnome-base/gnome-common-3.1.0
+[ebuild  N     ]   net-libs/libsoup-2.36.1  USE="introspection ssl -debug -doc -samba -test"
+[ebuild  N     ]    dev-libs/gobject-introspection-1.30.0-r2  USE="-doc -test"
+..............
+[ebuild  N    ~]  gnome-base/gnome-applets-3.2.1  USE="gnome ipv6 policykit -networkmanager"
+[ebuild  N    ~]  gnome-base/gdm-3.2.1.1-r2  USE="consolekit fallback gnome-keyring gnome-shell introspection ipv6 tcpd xklavier -accessibility -debug -fprint (-selinux) -smartcard -test -xinerama"
+[ebuild  N     ]   x11-apps/xhost-1.0.4  USE="ipv6"
+[ebuild  N     ]   x11-apps/sessreg-1.0.7
+[ebuild  N     ]  x11-themes/gnome-icon-theme-extras-3.0.0gnome-base/gnome-3.2.1:
+gnome-base/gnome-shell-3.2.2.1:
+gnome-base/gnome-common-3.1.0:
+net-libs/libsoup-2.36.1:
+dev-libs/gobject-introspection-1.30.0-r2:
+x11-libs/cairo-1.10.2-r1:
+..............
+gnome-base/gnome-applets-3.2.1:
+gnome-base/gdm-3.2.1.1-r2:
+x11-apps/xhost-1.0.4:
+x11-apps/sessreg-1.0.7:
+x11-themes/gnome-icon-theme-extras-3.0.0:
+
+Edit /var/tmp/pkscript/pks120202-02-55-34
+
+console# /var/tmp/pkscript/pks120202-02-55-34
+S gnome-base/gnome-3.2.1
+
+1<span style="font-weight: bold;color: #4b9506;">+ gnome-base/gnome-3.2.1</span>
+
+console# nano /var/tmp/pkscript/pks120202-02-55-34
+//// $pk[][S-setup or E|M-exclude]
+//// Delete # where need.
+ $pk[][S]=/**/"gnome-base/gnome-3.2.1";
+ $pk[][M]=/*||*/"net-im/empathy-3.2.2";
+ $pk[][M]=/*|||*/"media-video/cheese-3.2.2";
+ $pk[][M]=/*||||*/"media-video/gnome-video-effects-0.3.0";
+ $pk[][M]=/*|||*/"net-im/telepathy-connection-managers-1";
+ $pk[][M]=/*||*/"media-video/totem-3.2.1";
+ $pk[][M]=/*||*/"app-cdr/brasero-3.2.0-r1";
+ $pk[][M]=/*||*/"media-sound/sound-juicer-2.99.0_pre20111001";
+ $pk[][M]=/*||*/"app-misc/tracker-9999";
+ $pk[][M]=/*||*/"net-misc/vino-3.2.2";
+ $pk[][M]=/*||*/"gnome-extra/gnome-documents-0.2.1";
+ $pk[][M]=/*||*/"www-client/epiphany-3.2.1";
+ $pk[][M]=/*||*/"mail-client/evolution-3.2.2";
+ $pk[][M]=/*||*/"net-misc/vinagre-3.2.2";
+ $pk[][M]=/*||*/"games-board/aisleriot-3.2.2";
+ $pk[][M]=/*||*/"gnome-extra/gnome-games-3.2.1-r1";
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --desc
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M net-misc/vino-3.2.2
+M gnome-extra/gnome-documents-0.2.1
+M www-client/epiphany-3.2.1
+M mail-client/evolution-3.2.2
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+1<span style="color: #c60000;">! gnome-base/gnome-3.2.1 </span><span style="color: #6f4c75;">Meta package for GNOME 3, merge this package to install</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-shell-3.2.2.1 </span><span style="color: #6f4c75;">Provides core UI functions for the GNOME 3 desktop</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-common-3.1.0 </span><span style="color: #6f4c75;">Common files for development of Gnome packages</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ net-libs/libsoup-2.36.1 </span><span style="color: #6f4c75;">An HTTP library implementation in C</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ net-libs/telepathy-glib-0.16.3 </span><span style="color: #6f4c75;">GLib bindings for the Telepathy D-Bus protocol.</span>
+3..<span style="color: #c60000;">! gnome-extra/evolution-data-server-3.2.3 </span><span style="color: #6f4c75;">Evolution groupware backend</span>
+4...<span style="font-weight: bold;color: #4b9506;">@ dev-libs/nspr-4.8.9 </span><span style="color: #6f4c75;">Netscape Portable Runtime</span>
+4...<span style="font-weight: bold;color: #4b9506;">@ dev-libs/libical-0.43 </span><span style="color: #6f4c75;">a implementation of basic iCAL protocols from citadel, previously known as aurore.</span>
+4...<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gconf-2.32.4 </span><span style="color: #6f4c75;">Gnome Configuration System and Daemon</span>
+4...<span style="font-weight: bold;color: #4b9506;">@ net-libs/liboauth-0.9.6 </span><span style="color: #6f4c75;">C library implementing the OAuth secure authentication protocol</span>
+4...<span style="font-weight: bold;color: #4b9506;">@ dev-libs/libgweather-3.2.1 </span><span style="color: #6f4c75;">Library to access weather information from online services</span>
+4...<span style="font-weight: bold;color: #4b9506;">@ dev-libs/libgdata-0.10.1 </span><span style="color: #6f4c75;">GLib-based library for accessing online service APIs using the GData protocol</span>
+4...<span style="color: #c60000;">! net-libs/gnome-online-accounts-3.2.1 </span><span style="color: #6f4c75;">GNOME framework for accessing online accounts</span>
+5....<span style="font-weight: bold;color: #4b9506;">@ dev-util/gdbus-codegen-2.30.2 </span><span style="color: #6f4c75;">GDBus code and documentation generator</span>
+5....<span style="font-weight: bold;color: #4b9506;">@ net-libs/rest-0.7.12 </span><span style="color: #6f4c75;">Helper library for RESTful services</span>
+5....<span style="color: #c60000;">! gnome-base/gnome-control-center-3.2.2 </span><span style="color: #6f4c75;">GNOME Desktop Configuration Tool</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ app-text/iso-codes-3.30 </span><span style="color: #6f4c75;">Provides the list of country and language names</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ x11-libs/libxklavier-5.1 </span><span style="color: #6f4c75;">High level XKB library</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-desktop-3.2.1 </span><span style="color: #6f4c75;">Libraries for the gnome desktop that are not part of the UI</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ x11-libs/libXxf86misc-1.0.3 </span><span style="color: #6f4c75;">X.Org Xxf86misc library</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ gnome-base/libgnomekbd-3.2.0-r1 </span><span style="color: #6f4c75;">Gnome keyboard configuration library</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ media-libs/libcanberra-0.28-r5 </span><span style="color: #6f4c75;">Portable Sound Event Library</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ net-libs/libsocialweb-0.25.20 </span><span style="color: #6f4c75;">Social web services integration framework</span>
+6.....<span style="color: #c60000;"># media-video/cheese-3.2.2 </span><span style="color: #6f4c75;">A cheesy program to take pictures and videos from your webcam</span>
+7......<span style="color: #c60000;"># media-video/gnome-video-effects-0.3.0 </span><span style="color: #6f4c75;">Effects for Cheese, the webcam video and picture application</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ net-print/cups-pk-helper-0.2.1 </span><span style="color: #6f4c75;">PolicyKit helper to configure cups with fine-grained privileges</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ app-admin/apg-2.3.0b-r5 </span><span style="color: #6f4c75;">Another Password Generator</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-session-3.2.1-r1 </span><span style="color: #6f4c75;">Gnome session manager</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/nm-applet-0.9.2.0-r1 </span><span style="color: #6f4c75;">GNOME applet for NetworkManager</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ sys-apps/accountsservice-0.6.15 </span><span style="color: #6f4c75;">D-Bus interfaces for querying and manipulating user account information</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-menus-3.2.0.1-r1 </span><span style="color: #6f4c75;">The GNOME menu system, implementing the F.D.O cross-desktop spec</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ x11-apps/xmodmap-1.0.5 </span><span style="color: #6f4c75;">utility for modifying keymaps and pointer button mappings in X</span>
+6.....<span style="font-weight: bold;color: #4b9506;">@ gnome-base/libgtop-2.28.4 </span><span style="color: #6f4c75;">A library that provides top functionality to applications</span>
+5....<span style="font-weight: bold;color: #4b9506;">@ net-libs/webkit-gtk-1.6.1-r301 </span><span style="color: #6f4c75;">Open source web browser engine</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ x11-wm/mutter-3.2.2 </span><span style="color: #6f4c75;">GNOME 3 compositing window manager based on Clutter</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ dev-libs/gjs-1.30.1 </span><span style="color: #6f4c75;">Javascript bindings for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-accessibility/caribou-0.4.1 </span><span style="color: #6f4c75;">Input assistive technology intended for switch and pointer users</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ x11-apps/mesa-progs-8.0.1 </span><span style="color: #6f4c75;">Mesa's OpenGL utility and demo programs (glxgears and glxinfo)</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ dev-libs/folks-0.6.6 </span><span style="color: #6f4c75;">libfolks is a library that aggregates people from multiple sources</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ net-im/telepathy-logger-0.2.12 </span><span style="color: #6f4c75;">Telepathy Logger is a session daemon that should be activated whenever telepathy is being used.</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gvfs-1.10.1 </span><span style="color: #6f4c75;">GNOME Virtual Filesystem Layer</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-core-apps-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the core applications integrated with GNOME 3</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-editors/gedit-3.2.6 </span><span style="color: #6f4c75;">A text editor for the GNOME desktop</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-power-manager-3.2.1 </span><span style="color: #6f4c75;">Gnome Power Manager</span>
+3..<span style="color: #c60000;"># net-im/empathy-3.2.2 </span><span style="color: #6f4c75;">Telepathy client and library using GTK+</span>
+4...<span style="color: #c60000;"># net-im/telepathy-connection-managers-1 </span><span style="color: #6f4c75;">Meta-package for Telepathy Connection Managers</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ x11-terms/gnome-terminal-3.2.1 </span><span style="color: #6f4c75;">The Gnome Terminal</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-screensaver-3.2.0 </span><span style="color: #6f4c75;">Replaces xscreensaver, integrating with the desktop.</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-user-docs-3.2.1 </span><span style="color: #6f4c75;">GNOME end user documentation</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ media-gfx/eog-3.2.2 </span><span style="color: #6f4c75;">The Eye of GNOME image viewer</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-core-libs-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the core libraries of GNOME 3</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/yelp-3.2.1 </span><span style="color: #6f4c75;">Help browser for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-contacts-3.2.2 </span><span style="color: #6f4c75;">GNOME contact management application</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-crypt/seahorse-3.2.2 </span><span style="color: #6f4c75;">A GNOME application for managing encryption keys</span>
+3..<span style="color: #c60000;"># media-video/totem-3.2.1 </span><span style="color: #6f4c75;">Media player for GNOME</span>
+3..<span style="color: #c60000;"># app-cdr/brasero-3.2.0-r1 </span><span style="color: #6f4c75;">Brasero (aka Bonfire) is yet another application to burn CD/DVD for the gnome desktop.</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-fallback-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for GNOME 3 fallback mode</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-extra-apps-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the applications of GNOME 3</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-misc/tracker-0.12.9 </span><span style="color: #6f4c75;">A tagging metadata database, search tool and indexer</span>
+3..<span style="color: #c60000;"># net-misc/vinagre-3.2.2 </span><span style="color: #6f4c75;">VNC Client for the GNOME Desktop</span>
+3..<span style="color: #c60000;"># net-misc/vino-3.2.2 </span><span style="color: #6f4c75;">An integrated VNC server for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-tweak-tool-3.2.2-r2 </span><span style="color: #6f4c75;">Tool to customize GNOME 3 options</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-arch/file-roller-3.2.1 </span><span style="color: #6f4c75;">Archive manager for GNOME</span>
+3..<span style="color: #c60000;"># www-client/epiphany-3.2.1 </span><span style="color: #6f4c75;">GNOME webbrowser based on Webkit</span>
+3..<span style="color: #c60000;"># media-sound/sound-juicer-2.99.0_pre20111001 </span><span style="color: #6f4c75;">CD ripper for GNOME</span>
+3..<span style="color: #c60000;"># gnome-extra/gnome-documents-0.2.1 </span><span style="color: #6f4c75;">GNOME document manager</span>
+3..<span style="color: #c60000;"># games-board/aisleriot-3.2.2 </span><span style="color: #6f4c75;">A collection of solitaire card games for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-utils-3.2.1 </span><span style="color: #6f4c75;">Utilities for the Gnome desktop</span>
+3..<span style="color: #c60000;"># gnome-extra/gnome-games-3.2.1-r1 </span><span style="color: #6f4c75;">Collection of games for the GNOME desktop</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-system-monitor-3.2.1 </span><span style="color: #6f4c75;">The Gnome System Monitor</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ net-analyzer/gnome-nettool-3.0.1 </span><span style="color: #6f4c75;">Collection of network tools</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ media-gfx/shotwell-0.11.6 </span><span style="color: #6f4c75;">Open source photo manager for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gconf-editor-3.0.1 </span><span style="color: #6f4c75;">An editor to the GNOME 2 config system</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gucharmap-3.2.2 </span><span style="color: #6f4c75;">Unicode character map viewer and library</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gcalctool-6.2.0 </span><span style="color: #6f4c75;">A calculator application for GNOME</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ x11-themes/gnome-backgrounds-3.2.0 </span><span style="color: #6f4c75;">A set of backgrounds packaged with the GNOME desktop</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-applets-3.2.1 </span><span style="color: #6f4c75;">Applets for the GNOME Desktop and Panel</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gdm-3.2.1.1-r2 </span><span style="color: #6f4c75;">GNOME Display Manager</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ x11-themes/gnome-icon-theme-extras-3.0.0 </span><span style="color: #6f4c75;">GNOME 2 icon theme extras</span>
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --test
+......
+(dependency required by "<span style="color: #4b9506;">gnome-base/gnome-control-center-3.2.2[cheese]</span>" [ebuild])
+(dependency required by "<span style="color: #4b9506;">gnome-base/gnome-shell-3.2.2.1</span>" [ebuild])
+(dependency required by "<span style="color: #4b9506;">gnome-base/gdm-3.2.1.1-r2[gnome-shell]</span>" [ebuild])
+(dependency required by "<span style="color: #4b9506;">=gnome-base/gdm-3.2.1.1-r2</span>" [argument])
+For more information, see the MASKED PACKAGES section in the emerge
+man page or refer to the Gentoo Handbook.
+
+console# echo "gnome-base/gnome-control-center -cheese" >> /etc/portage/package.use
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --test
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M net-misc/vino-3.2.2
+M gnome-extra/gnome-documents-0.2.1
+M www-client/epiphany-3.2.1
+M mail-client/evolution-3.2.2
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+emerge -p --unordered-display --color=y --autounmask=y  =gnome-base/gnome-common-3.1.0 =net-libs/libsoup-2.36.1 =net-libs/telepathy-glib-0.16.3 =dev-libs/nspr-4.8.9 =dev-libs/libical-0.43 =gnome-base/gconf-2.32.4 =net-libs/liboauth-0.9.6 =dev-libs/libgweather-3.2.1 =dev-libs/libgdata-0.10.1 =dev-util/gdbus-codegen-2.30.2 =net-libs/rest-0.7.12 =app-text/iso-codes-3.30 =x11-libs/libxklavier-5.1 =gnome-base/gnome-desktop-3.2.1 =x11-libs/libXxf86misc-1.0.3 =gnome-base/libgnomekbd-3.2.0-r1 =media-libs/libcanberra-0.28-r5 =net-libs/libsocialweb-0.25.20 =net-print/cups-pk-helper-0.2.1 =app-admin/apg-2.3.0b-r5 =gnome-base/gnome-session-3.2.1-r1 =gnome-extra/nm-applet-0.9.2.0-r1 =sys-apps/accountsservice-0.6.15 =gnome-base/gnome-menus-3.2.0.1-r1 =x11-apps/xmodmap-1.0.5 =gnome-base/libgtop-2.28.4 =net-libs/webkit-gtk-1.6.1-r301 =x11-wm/mutter-3.2.2 =dev-libs/gjs-1.30.1 =app-accessibility/caribou-0.4.1 =x11-apps/mesa-progs-8.0.1 =dev-libs/folks-0.6.6 =net-im/telepathy-logger-0.2.12 =gnome-base/gvfs-1.10.1 =app-editors/gedit-3.2.6 =gnome-extra/gnome-power-manager-3.2.1 =x11-terms/gnome-terminal-3.2.1 =gnome-extra/gnome-screensaver-3.2.0 =gnome-extra/gnome-user-docs-3.2.1 =media-gfx/eog-3.2.2 =gnome-base/gnome-core-libs-3.2.1 =gnome-extra/yelp-3.2.1 =gnome-extra/gnome-contacts-3.2.2 =app-crypt/seahorse-3.2.2 =gnome-base/gnome-fallback-3.2.1 =app-misc/tracker-0.12.9 =gnome-extra/gnome-tweak-tool-3.2.2-r2 =app-arch/file-roller-3.2.1 =gnome-extra/gnome-utils-3.2.1 =gnome-extra/gnome-system-monitor-3.2.1 =net-analyzer/gnome-nettool-3.0.1 =media-gfx/shotwell-0.11.6 =gnome-extra/gconf-editor-3.0.1 =gnome-extra/gucharmap-3.2.2 =gnome-extra/gcalctool-6.2.0 =x11-themes/gnome-backgrounds-3.2.0 =gnome-base/gnome-applets-3.2.1 =gnome-base/gdm-3.2.1.1-r2 =x11-themes/gnome-icon-theme-extras-3.0.0 --exclude media-video/cheese --exclude media-video/gnome-video-effects --exclude net-im/empathy --exclude net-im/telepathy-connection-managers --exclude media-video/totem --exclude app-cdr/brasero --exclude net-misc/vinagre --exclude net-misc/vino --exclude www-client/epiphany --exclude media-sound/sound-juicer --exclude gnome-extra/gnome-documents --exclude games-board/aisleriot --exclude gnome-extra/gnome-games
+
+
+<span style="color: #4b9506;">These are the packages that would be merged, in order:</span>
+
+Calculating dependencies  ... done!
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">sys-apps/pciutils-3.1.7</span>  USE="<span style="font-weight: bold;color: #32609c;">-network-cron</span> <span style="font-weight: bold;color: #32609c;">-zlib</span>"
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">app-text/libpaper-1.1.23</span>
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">media-gfx/shared-color-profiles-0.1.4</span>
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">app-text/poppler-data-0.4.4</span>
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="color: #4b9506;">app-crypt/p11-kit-0.10</span>  USE="<span style="font-weight: bold;color: #32609c;">-debug</span>"
+..............
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-base/gnome-applets-3.2.1</span>  USE="<span style="font-weight: bold;color: #c60000;">gnome</span> <span style="font-weight: bold;color: #c60000;">ipv6</span> <span style="font-weight: bold;color: #c60000;">policykit</span> <span style="font-weight: bold;color: #32609c;">-networkmanager</span>"
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-extra/gnome-tweak-tool-3.2.2-r2</span>
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-base/gdm-3.2.1.1-r2</span>  USE="<span style="font-weight: bold;color: #c60000;">consolekit</span> <span style="font-weight: bold;color: #c60000;">fallback</span> <span style="font-weight: bold;color: #c60000;">gnome-keyring</span> <span style="font-weight: bold;color: #c60000;">gnome-shell</span> <span style="font-weight: bold;color: #c60000;">introspection</span> <span style="font-weight: bold;color: #c60000;">ipv6</span> <span style="font-weight: bold;color: #c60000;">tcpd</span> <span style="font-weight: bold;color: #c60000;">xklavier</span> <span style="font-weight: bold;color: #32609c;">-accessibility</span> <span style="font-weight: bold;color: #32609c;">-debug</span> <span style="font-weight: bold;color: #32609c;">-fprint</span> (<span style="font-weight: bold;color: #32609c;">-selinux</span>) <span style="font-weight: bold;color: #32609c;">-smartcard</span> <span style="font-weight: bold;color: #32609c;">-test</span> <span style="font-weight: bold;color: #32609c;">-xinerama</span>"
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">app-misc/tracker-0.12.9</span>  USE="<span style="font-weight: bold;color: #c60000;">eds</span> <span style="font-weight: bold;color: #c60000;">exif</span> <span style="font-weight: bold;color: #c60000;">flac</span> <span style="font-weight: bold;color: #c60000;">gif</span> <span style="font-weight: bold;color: #c60000;">gnome-keyring</span> <span style="font-weight: bold;color: #c60000;">gstreamer</span> <span style="font-weight: bold;color: #c60000;">gtk</span> <span style="font-weight: bold;color: #c60000;">jpeg</span> <span style="font-weight: bold;color: #c60000;">mp3</span> <span style="font-weight: bold;color: #c60000;">nautilus</span> <span style="font-weight: bold;color: #c60000;">pdf</span> <span style="font-weight: bold;color: #c60000;">tiff</span> <span style="font-weight: bold;color: #c60000;">vorbis</span> <span style="font-weight: bold;color: #c60000;">xml</span> (<span style="font-weight: bold;color: #32609c;">-applet</span>) <span style="font-weight: bold;color: #32609c;">-doc</span> <span style="font-weight: bold;color: #32609c;">-firefox-bookmarks</span> <span style="font-weight: bold;color: #32609c;">-flickr</span> <span style="font-weight: bold;color: #32609c;">-gsf</span> <span style="font-weight: bold;color: #32609c;">-iptc</span> <span style="font-weight: bold;color: #32609c;">-laptop</span> <span style="font-weight: bold;color: #32609c;">-networkmanager</span> <span style="font-weight: bold;color: #32609c;">-playlist</span> <span style="font-weight: bold;color: #32609c;">-rss</span> <span style="font-weight: bold;color: #32609c;">-test</span> <span style="font-weight: bold;color: #32609c;">-thunderbird</span> <span style="font-weight: bold;color: #32609c;">-upnp</span> <span style="font-weight: bold;color: #32609c;">-xine</span> <span style="font-weight: bold;color: #32609c;">-xmp</span>"
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="color: #4b9506;">gnome-extra/nautilus-tracker-tags-0.12.9</span>
+
+OK :)
+
+Unnecessary packages are desirable for mask, that emerge them "casually" has not setup without any warning.
+The difference between --mask and --mask-ver (with version) for emerge is shown at the top.
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --mask
+net-im/empathy
+media-video/cheese
+media-video/gnome-video-effects
+net-im/telepathy-connection-managers
+media-video/totem
+app-cdr/brasero
+media-sound/sound-juicer
+app-misc/tracker
+net-misc/vino
+gnome-extra/gnome-documents
+www-client/epiphany
+mail-client/evolution
+net-misc/vinagre
+games-board/aisleriot
+gnome-extra/gnome-games
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --mask >> /etc/portage/package.mask
+
+Now you can get a new tree.
+
+console# /var/tmp/pkscript/pks120202-02-55-34 --new
+New script /var/tmp/pkscript/pks120202-03-19-49
+
+console# /var/tmp/pkscript/pks120202-03-19-49
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M mail-client/evolution-3.2.3
+M net-misc/vino-3.2.2
+M www-client/epiphany-3.2.1
+M gnome-extra/gnome-documents-0.2.1
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+1<span style="color: #c60000;">! gnome-base/gnome-3.2.1</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-shell-3.2.2.1</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gvfs-1.10.1</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-core-apps-3.2.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-editors/gedit-3.2.6</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-power-manager-3.2.1</span>
+3..<span style="color: #c60000;"># net-im/empathy-3.2.2</span>
+4...<span style="color: #c60000;"># media-video/cheese-3.2.2</span>
+5....<span style="color: #c60000;"># media-video/gnome-video-effects-0.3.0</span>
+4...<span style="color: #c60000;"># net-im/telepathy-connection-managers-1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ x11-terms/gnome-terminal-3.2.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-screensaver-3.2.0</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-user-docs-3.2.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ media-gfx/eog-3.2.2</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-core-libs-3.2.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/yelp-3.2.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-contacts-3.2.2</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-crypt/seahorse-3.2.2</span>
+3..<span style="color: #c60000;"># media-video/totem-3.2.1</span>
+3..<span style="color: #c60000;"># app-cdr/brasero-3.2.0-r1</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-fallback-3.2.1</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-extra-apps-3.2.1</span>
+3..<span style="color: #c60000;"># media-sound/sound-juicer-2.99.0_pre20111001</span>
+3..<span style="color: #c60000;"># app-misc/tracker-9999</span>
+4...<span style="color: #c60000;"># mail-client/evolution-3.2.3</span>
+3..<span style="color: #c60000;"># net-misc/vino-3.2.2</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-tweak-tool-3.2.2-r2</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-arch/file-roller-3.2.1</span>
+3..<span style="color: #c60000;"># www-client/epiphany-3.2.1</span>
+3..<span style="color: #c60000;"># gnome-extra/gnome-documents-0.2.1</span>
+3..<span style="color: #c60000;"># net-misc/vinagre-3.2.2</span>
+3..<span style="color: #c60000;"># games-board/aisleriot-3.2.2</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-utils-3.2.1</span>
+3..<span style="color: #c60000;"># gnome-extra/gnome-games-3.2.1-r1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-system-monitor-3.2.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ net-analyzer/gnome-nettool-3.0.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ media-gfx/shotwell-0.11.6</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gconf-editor-3.0.1</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gucharmap-3.2.2</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gcalctool-6.2.0</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ x11-themes/gnome-backgrounds-3.2.0</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-applets-3.2.1</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gdm-3.2.1.1-r2</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ x11-themes/gnome-icon-theme-extras-3.0.0</span>
+
+console# /var/tmp/pkscript/pks120202-03-19-49 --desc
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M mail-client/evolution-3.2.3
+M net-misc/vino-3.2.2
+M www-client/epiphany-3.2.1
+M gnome-extra/gnome-documents-0.2.1
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+1<span style="color: #c60000;">! gnome-base/gnome-3.2.1 </span><span style="color: #6f4c75;">Meta package for GNOME 3, merge this package to install</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-shell-3.2.2.1 </span><span style="color: #6f4c75;">Provides core UI functions for the GNOME 3 desktop</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gvfs-1.10.1 </span><span style="color: #6f4c75;">GNOME Virtual Filesystem Layer</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-core-apps-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the core applications integrated with GNOME 3</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-editors/gedit-3.2.6 </span><span style="color: #6f4c75;">A text editor for the GNOME desktop</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-power-manager-3.2.1 </span><span style="color: #6f4c75;">Gnome Power Manager</span>
+3..<span style="color: #c60000;"># net-im/empathy-3.2.2 </span><span style="color: #6f4c75;">Telepathy client and library using GTK+</span>
+4...<span style="color: #c60000;"># media-video/cheese-3.2.2 </span><span style="color: #6f4c75;">A cheesy program to take pictures and videos from your webcam</span>
+5....<span style="color: #c60000;"># media-video/gnome-video-effects-0.3.0 </span><span style="color: #6f4c75;">Effects for Cheese, the webcam video and picture application</span>
+4...<span style="color: #c60000;"># net-im/telepathy-connection-managers-1 </span><span style="color: #6f4c75;">Meta-package for Telepathy Connection Managers</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ x11-terms/gnome-terminal-3.2.1 </span><span style="color: #6f4c75;">The Gnome Terminal</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-screensaver-3.2.0 </span><span style="color: #6f4c75;">Replaces xscreensaver, integrating with the desktop.</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-user-docs-3.2.1 </span><span style="color: #6f4c75;">GNOME end user documentation</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ media-gfx/eog-3.2.2 </span><span style="color: #6f4c75;">The Eye of GNOME image viewer</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-core-libs-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the core libraries of GNOME 3</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/yelp-3.2.1 </span><span style="color: #6f4c75;">Help browser for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-contacts-3.2.2 </span><span style="color: #6f4c75;">GNOME contact management application</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-crypt/seahorse-3.2.2 </span><span style="color: #6f4c75;">A GNOME application for managing encryption keys</span>
+3..<span style="color: #c60000;"># media-video/totem-3.2.1 </span><span style="color: #6f4c75;">Media player for GNOME</span>
+3..<span style="color: #c60000;"># app-cdr/brasero-3.2.0-r1 </span><span style="color: #6f4c75;">Brasero (aka Bonfire) is yet another application to burn CD/DVD for the gnome desktop.</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-fallback-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for GNOME 3 fallback mode</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-extra-apps-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the applications of GNOME 3</span>
+3..<span style="color: #c60000;"># media-sound/sound-juicer-2.99.0_pre20111001 </span><span style="color: #6f4c75;">CD ripper for GNOME</span>
+3..<span style="color: #c60000;"># app-misc/tracker-9999 </span><span style="color: #6f4c75;">A tagging metadata database, search tool and indexer</span>
+4...<span style="color: #c60000;"># mail-client/evolution-3.2.3 </span><span style="color: #6f4c75;">Integrated mail, addressbook and calendaring functionality</span>
+3..<span style="color: #c60000;"># net-misc/vino-3.2.2 </span><span style="color: #6f4c75;">An integrated VNC server for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-tweak-tool-3.2.2-r2 </span><span style="color: #6f4c75;">Tool to customize GNOME 3 options</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ app-arch/file-roller-3.2.1 </span><span style="color: #6f4c75;">Archive manager for GNOME</span>
+3..<span style="color: #c60000;"># www-client/epiphany-3.2.1 </span><span style="color: #6f4c75;">GNOME webbrowser based on Webkit</span>
+3..<span style="color: #c60000;"># gnome-extra/gnome-documents-0.2.1 </span><span style="color: #6f4c75;">GNOME document manager</span>
+3..<span style="color: #c60000;"># net-misc/vinagre-3.2.2 </span><span style="color: #6f4c75;">VNC Client for the GNOME Desktop</span>
+3..<span style="color: #c60000;"># games-board/aisleriot-3.2.2 </span><span style="color: #6f4c75;">A collection of solitaire card games for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-utils-3.2.1 </span><span style="color: #6f4c75;">Utilities for the Gnome desktop</span>
+3..<span style="color: #c60000;"># gnome-extra/gnome-games-3.2.1-r1 </span><span style="color: #6f4c75;">Collection of games for the GNOME desktop</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gnome-system-monitor-3.2.1 </span><span style="color: #6f4c75;">The Gnome System Monitor</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ net-analyzer/gnome-nettool-3.0.1 </span><span style="color: #6f4c75;">Collection of network tools</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ media-gfx/shotwell-0.11.6 </span><span style="color: #6f4c75;">Open source photo manager for GNOME</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gconf-editor-3.0.1 </span><span style="color: #6f4c75;">An editor to the GNOME 2 config system</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gucharmap-3.2.2 </span><span style="color: #6f4c75;">Unicode character map viewer and library</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-extra/gcalctool-6.2.0 </span><span style="color: #6f4c75;">A calculator application for GNOME</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ x11-themes/gnome-backgrounds-3.2.0 </span><span style="color: #6f4c75;">A set of backgrounds packaged with the GNOME desktop</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-applets-3.2.1 </span><span style="color: #6f4c75;">Applets for the GNOME Desktop and Panel</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gdm-3.2.1.1-r2 </span><span style="color: #6f4c75;">GNOME Display Manager</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ x11-themes/gnome-icon-theme-extras-3.0.0 </span><span style="color: #6f4c75;">GNOME 2 icon theme extras</span>
+
+Meta-packages are not needed for work, so it is possible to do without them :)
+console# /var/tmp/pkscript/pks120202-03-19-49 --desc | grep -i meta
+1<span style="color: #c60000;">! gnome-base/gnome-3.2.1 </span><span style="color: #6f4c75;">Meta package for GNOME 3, merge this package to install</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-core-apps-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the core applications integrated with GNOME 3</span>
+4...<span style="color: #c60000;"># net-im/telepathy-connection-managers-1 </span><span style="color: #6f4c75;">Meta-package for Telepathy Connection Managers</span>
+3..<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-core-libs-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the core libraries of GNOME 3</span>
+2.<span style="font-weight: bold;color: #4b9506;">@ gnome-base/gnome-fallback-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for GNOME 3 fallback mode</span>
+2.<span style="color: #c60000;">! gnome-base/gnome-extra-apps-3.2.1 </span><span style="color: #6f4c75;">Sub-meta package for the applications of GNOME 3</span>
+
+console# /var/tmp/pkscript/pks120202-03-19-49 --test
+S gnome-base/gnome-3.2.1
+M net-im/empathy-3.2.2
+M media-video/cheese-3.2.2
+M media-video/gnome-video-effects-0.3.0
+M net-im/telepathy-connection-managers-1
+M media-video/totem-3.2.1
+M app-cdr/brasero-3.2.0-r1
+M media-sound/sound-juicer-2.99.0_pre20111001
+M app-misc/tracker-9999
+M mail-client/evolution-3.2.3
+M net-misc/vino-3.2.2
+M www-client/epiphany-3.2.1
+M gnome-extra/gnome-documents-0.2.1
+M net-misc/vinagre-3.2.2
+M games-board/aisleriot-3.2.2
+M gnome-extra/gnome-games-3.2.1-r1
+
+emerge -p --unordered-display --color=y --autounmask=y  =gnome-base/gnome-shell-3.2.2.1 =gnome-base/gvfs-1.10.1 =app-editors/gedit-3.2.6 =gnome-extra/gnome-power-manager-3.2.1 =x11-terms/gnome-terminal-3.2.1 =gnome-extra/gnome-screensaver-3.2.0 =gnome-extra/gnome-user-docs-3.2.1 =media-gfx/eog-3.2.2 =gnome-base/gnome-core-libs-3.2.1 =gnome-extra/yelp-3.2.1 =gnome-extra/gnome-contacts-3.2.2 =app-crypt/seahorse-3.2.2 =gnome-base/gnome-fallback-3.2.1 =gnome-extra/gnome-tweak-tool-3.2.2-r2 =app-arch/file-roller-3.2.1 =gnome-extra/gnome-utils-3.2.1 =gnome-extra/gnome-system-monitor-3.2.1 =net-analyzer/gnome-nettool-3.0.1 =media-gfx/shotwell-0.11.6 =gnome-extra/gconf-editor-3.0.1 =gnome-extra/gucharmap-3.2.2 =gnome-extra/gcalctool-6.2.0 =x11-themes/gnome-backgrounds-3.2.0 =gnome-base/gnome-applets-3.2.1 =gnome-base/gdm-3.2.1.1-r2 =x11-themes/gnome-icon-theme-extras-3.0.0 --exclude net-im/empathy --exclude media-video/cheese --exclude media-video/gnome-video-effects --exclude net-im/telepathy-connection-managers --exclude media-video/totem --exclude app-cdr/brasero --exclude media-sound/sound-juicer --exclude app-misc/tracker --exclude mail-client/evolution --exclude net-misc/vino --exclude www-client/epiphany --exclude gnome-extra/gnome-documents --exclude net-misc/vinagre --exclude games-board/aisleriot --exclude gnome-extra/gnome-games
+
+
+<span style="color: #4b9506;">These are the packages that would be merged, in order:</span>
+
+Calculating dependencies  . ..... done!
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">sys-apps/pciutils-3.1.7</span>  USE="<span style="font-weight: bold;color: #32609c;">-network-cron</span> <span style="font-weight: bold;color: #32609c;">-zlib</span>"
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">app-text/libpaper-1.1.23</span>
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">app-text/poppler-data-0.4.4</span>
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="color: #4b9506;">app-crypt/p11-kit-0.10</span>  USE="<span style="font-weight: bold;color: #32609c;">-debug</span>"
+[<span style="color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>     ] <span style="color: #4b9506;">media-gfx/shared-color-profiles-0.1.4</span>
+..............
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-extra/gnome-contacts-3.2.2</span>
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-base/gnome-fallback-3.2.1</span>  USE="<span style="font-weight: bold;color: #c60000;">cups</span>"
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-base/gnome-applets-3.2.1</span>  USE="<span style="font-weight: bold;color: #c60000;">gnome</span> <span style="font-weight: bold;color: #c60000;">ipv6</span> <span style="font-weight: bold;color: #c60000;">policykit</span> <span style="font-weight: bold;color: #32609c;">-networkmanager</span>"
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-extra/gnome-tweak-tool-3.2.2-r2</span>
+[<span style="font-weight: bold;color: #4b9506;">ebuild</span>  <span style="font-weight: bold;color: #4b9506;">N</span>    <span style="font-weight: bold;color: #bc9900;">~</span>] <span style="font-weight: bold;color: #4b9506;">gnome-base/gdm-3.2.1.1-r2</span>  USE="<span style="font-weight: bold;color: #c60000;">consolekit</span> <span style="font-weight: bold;color: #c60000;">fallback</span> <span style="font-weight: bold;color: #c60000;">gnome-keyring</span> <span style="font-weight: bold;color: #c60000;">gnome-shell</span> <span style="font-weight: bold;color: #c60000;">introspection</span> <span style="font-weight: bold;color: #c60000;">ipv6</span> <span style="font-weight: bold;color: #c60000;">tcpd</span> <span style="font-weight: bold;color: #c60000;">xklavier</span> <span style="font-weight: bold;color: #32609c;">-accessibility</span> <span style="font-weight: bold;color: #32609c;">-debug</span> <span style="font-weight: bold;color: #32609c;">-fprint</span> (<span style="font-weight: bold;color: #32609c;">-selinux</span>) <span style="font-weight: bold;color: #32609c;">-smartcard</span> <span style="font-weight: bold;color: #32609c;">-test</span> <span style="font-weight: bold;color: #32609c;">-xinerama</span>"
+
+FINISH :)
+console# /var/tmp/pkscript/pks120202-03-19-49 --exec && shutdown -h now
+
+Go to sleep :)
+</pre>
+</body>
+</html>
