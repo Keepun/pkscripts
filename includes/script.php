@@ -264,7 +264,7 @@ result();
 if ($_ONLYPK)
 {
 	command();
-	$_command='emerge -p '.$_EMERGE_TEST.' '.$_command.$_command_ex;
+	$_command='emerge -p '.$_EMERGE_TEST.' '.$_EMERGE.' '.$_command.$_command_ex;
 	print $_command."\n\n";
 	if ($_EXEC) system($_command);
 	die();
@@ -273,7 +273,7 @@ if ($_ONLYPK)
 if ($_EXEC)
 {
 	command();
-	$_command='emerge '.$_EMERGE_SETUP.' '.$_command.$_command_ex;
+	$_command='emerge '.$_EMERGE_SETUP.' '.$_EMERGE.' '.$_command.$_command_ex;
 	print $_command."\n\n";
 	system($_command);
 	die();
