@@ -458,6 +458,6 @@ Calculating dependencies  . ..... done!
 [ebuild  N    ~] gnome-base/gdm-3.2.1.1-r2  USE="consolekit fallback gnome-keyring gnome-shell introspection ipv6 tcpd xklavier -accessibility -debug -fprint (-selinux) -smartcard -test -xinerama"
 
 FINISH :)
-console# /var/tmp/pkscript/pks120202-03-19-49 --exec && shutdown -h now
+console# /var/tmp/pkscript/pks120202-03-19-49 --exec ; shutdown -h now
 
 Go to sleep :)
