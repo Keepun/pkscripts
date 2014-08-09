@@ -1,0 +1,49 @@
+#!/usr/bin/php
+<?php
+$emerge = array();
+$emerge_cmd = "emerge --keep-going=y --color=n -uND -p @world ";
+exec("$emerge_cmd |& cat", $emerge);
+print implode("\n", $emerge);
+
+$packages = array();
+foreach ($emerge as $str) {
+    if (strpos($str, '[ebuild') !== FALSE) {
+        $info = explode(' ', trim($str));
+        array_shift($info);
+        $flags = '';
+        foreach ($info as $inf) {
+            if ($inf === '') {
+                continue;
+            }
+            if ($inf === ']' || $inf === '~]') {
+                if ($inf === '~]') {
+                    $flags .= '~';
+                }
+                if ($flags !== 'U' && $flags !== 'U~') {
+                    break;
+                } else {
+                    $flags = ']';
+                    continue;
+                }
+            }
+            if ($flags === ']') {
+                $packages[] = $inf;
+                break;
+            }
+            $flags .= $inf;
+        }
+    }
+}
+
+print "Now update:\n=====================\n";
+foreach ($packages as $key => $value) {
+    print ($key+1).' = '.$value."\n";
+}
+print "=====================\n";
+
+foreach ($packages as $key => $value) {
+    print ($key+1).' = '.$value."\n=====================\n";
+    $cmd = 'emerge -1 --color=y ='.$value;
+    print $cmd."\n";
+    system($cmd);
+}
