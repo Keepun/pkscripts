@@ -35,14 +35,16 @@ foreach ($emerge as $str) {
     }
 }
 
+$count = count($packages);
+
 print "Now update:\n=====================\n";
 foreach ($packages as $key => $value) {
-    print ($key+1).' = '.$value."\n";
+    print ($key+1).'/'.$count.' = '.$value."\n";
 }
 print "=====================\n";
 
 foreach ($packages as $key => $value) {
-    print ($key+1).' = '.$value."\n=====================\n";
+    print ($key+1).'/'.$count.' = '.$value."\n=====================\n";
     $cmd = 'emerge -1 --color=y ='.$value;
     print $cmd."\n";
     system($cmd);
