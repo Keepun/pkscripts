@@ -15,11 +15,9 @@ foreach ($emerge as $str) {
             if ($inf === '') {
                 continue;
             }
-            if ($inf === ']' || $inf === '~]') {
-                if ($inf === '~]') {
-                    $flags .= '~';
-                }
-                if ($flags !== 'U' && $flags !== 'U~') {
+            if (strpbrk($inf, ']') !== FALSE) {
+                $flags .= $inf;
+                if (strpbrk($flags, 'DFIBb') !== FALSE) {
                     break;
                 } else {
                     $flags = ']';
