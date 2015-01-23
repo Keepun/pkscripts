@@ -43,7 +43,7 @@ print "=====================\n";
 
 foreach ($packages as $key => $value) {
     print ($key+1).'/'.$count.' = '.$value."\n=====================\n";
-    $cmd = 'emerge -1 --color=y ='.$value;
+    $cmd = 'emerge -1 --buildpkg=y --usepkg=y --color=y ='.$value;
     print $cmd."\n";
     system($cmd);
 }
